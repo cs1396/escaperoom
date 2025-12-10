@@ -23,6 +23,7 @@ jobs:
     # Use the Bash shell
     defaults:
       run:
+        working-directory: "data_server/infrastructure"
         shell: bash
 
     steps:
@@ -33,9 +34,6 @@ jobs:
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
-      with:
-        tf_actions_working_dir: 'data_server/infrastructure'
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
