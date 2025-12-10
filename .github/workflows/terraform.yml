@@ -42,21 +42,17 @@ jobs:
 
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
-      uses: hashicorp/setup-terraform@v3
       run: terraform init
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
-      uses: hashicorp/setup-terraform@v3
       run: terraform fmt -check
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      uses: hashicorp/setup-terraform@v3
       run: terraform plan -input=false
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
-      uses: hashicorp/setup-terraform@v3
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
