@@ -42,6 +42,7 @@ jobs:
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
       run: terraform init
+           echo "${{secrets.AWS_ACCESS_KEY_ID}}"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
