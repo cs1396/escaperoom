@@ -201,12 +201,15 @@ public class MapLoader {
 
     for (File f : mapContentDir.listFiles()) {
       if (f.getName().equals("mapdata.json")) {
+        log.info("-> Found mapdata.json");
         mapData = f;
       }
       if (f.getName().equals("textures")) {
+        log.info("-> Found a texture directory");
         definesTextures = true;
       }
       if (f.getName().equals("objects")) {
+        log.info("-> Found an object directory");
         definesObjects = true;
       }
     }
