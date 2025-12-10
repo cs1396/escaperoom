@@ -15,7 +15,6 @@
  - [ ] switching tools doesnt always properly clear the previous tool (?)
 
 ## bugs
-- [ ] leaderboard is wrong??
 - [ ] placing something in the world doesnt update inventory checks until you move
 - [ ] copying a map and going to editor for first time always fails to load textures
 - [ ] copying a map does not copy game settings; probably move from metadata to mapdata
