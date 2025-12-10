@@ -1,0 +1,71 @@
+# This workflow installs the latest version of Terraform CLI
+# On pull request events, this workflow will run `terraform init`, `terraform fmt`, and `terraform plan`.
+# On push events to the "main" branch, `terraform apply` will be executed.
+#
+# Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
+
+name: 'Deploy Server'
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "data_server/**" ]
+  pull_request:
+    paths: [ "data_server/**" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: "us-east-2"
+  MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
+  MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
+
+jobs:
+  terraform:
+    name: "Deploy Server"
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell
+    defaults:
+      run:
+        working-directory: "data_server/infrastructure"
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Read and load aws credentials
+    - name: Load Credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Build using the makefile
+    - name: Build Server
+      working-directory: "data_server"
+      run: make build
+
+    # Install the latest version of Terraform CLI and configure
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    # Initialize a new or existing Terraform working directory
+    - name: Terraform Init
+      run: terraform init
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false
+
+    # On push to "main", build or change infrastructure according to Terraform configuration files
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
