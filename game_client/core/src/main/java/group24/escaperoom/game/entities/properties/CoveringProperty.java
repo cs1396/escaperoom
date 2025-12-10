@@ -1,6 +1,7 @@
 package group24.escaperoom.game.entities.properties;
 
 
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import group24.escaperoom.game.entities.Item;
@@ -9,6 +10,7 @@ import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.ui.ContainerUI;
 import group24.escaperoom.game.ui.GameDialog;
+import group24.escaperoom.ui.widgets.G24Dialog;
 
 public class CoveringProperty extends ContainsItemProperty {
 
@@ -39,9 +41,9 @@ public class CoveringProperty extends ContainsItemProperty {
     public ActionResult act(GameContext ctx) {
       return new ActionResult()
         .showsDialog(
-          new GameDialog(
-            new ContainerUI(CoveringProperty.this,  ctx.player), ctx.player, "Was covering..."
-          )
+          new GameDialog.Builder("Was Covering", ctx.player)
+            .withContent(new ContainerUI(CoveringProperty.this, ctx.player))
+            .build()
         );
     }
 

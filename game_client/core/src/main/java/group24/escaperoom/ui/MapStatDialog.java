@@ -44,7 +44,7 @@ public class MapStatDialog extends G24Dialog {
   }
 
   public MapStatDialog(MapMetadata met, MapStats stats) {
-    super(met.name);
+    super(new Builder(met.name));
 
     this.metadata = met;
     Table t = getContentTable();
@@ -143,7 +143,6 @@ public class MapStatDialog extends G24Dialog {
           thumbnailContainer.setActor(i);
         });
       });
-      return null;
     });
     return d;
 

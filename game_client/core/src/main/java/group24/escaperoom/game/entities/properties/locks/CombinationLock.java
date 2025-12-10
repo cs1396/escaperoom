@@ -39,7 +39,7 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
         return ActionResult.DEFAULT;
       }
 
-      GameDialog dialog = new GameDialog( ctx.player, "Enter Combination");
+      GameDialog dialog = new GameDialog.Builder("Enter Combination", ctx.player).build();
 
       Table table = new Table();
       G24NumberInput[] digits = new G24NumberInput[combination.length()];
@@ -105,7 +105,7 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
       table.add(submitButton).align(Align.center).colspan(digits.length);
       table.row();
 
-      dialog.setContent(table);
+      dialog.getContentTable().add(table).center();
       return new ActionResult().showsDialog(dialog);
     }
 

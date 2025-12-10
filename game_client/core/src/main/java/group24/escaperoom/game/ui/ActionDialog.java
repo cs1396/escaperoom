@@ -56,6 +56,7 @@ public class ActionDialog extends GameDialog {
             }
 
             result.getDialog().ifPresent(dialog -> {
+              dialog.disableSpawner(buttons.get(action));
               dialog.show(ActionButton.this.getStage());
               setChecked(false);
               if (!action.isValid(ctx)){
@@ -94,7 +95,7 @@ public class ActionDialog extends GameDialog {
    * @param player the player which is doing the interacting
    */
   public ActionDialog(Item item, Player player) {
-    super(player, "Actions for " + item.getItemName() + "...");
+    super(new GameDialog.Builder("Actions for " + item.getItemName() + "...", player));
     this.item = item;
     setModal(false);
     GameContext ctx = new GameContext(player.getGameScreen(), player);

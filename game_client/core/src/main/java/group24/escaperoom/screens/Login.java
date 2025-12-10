@@ -65,7 +65,6 @@ public class Login extends MenuScreen {
         } else {
           Notifier.error("Failed to create account: (code: " + code.name() + ")");
         }
-        return null;
       }, "Creating account and logging in");
     }
 
@@ -105,7 +104,6 @@ public class Login extends MenuScreen {
         } else {
           Notifier.warn("Error logging in: " + code.toString());
         }
-        return null;
       });
     }
   }

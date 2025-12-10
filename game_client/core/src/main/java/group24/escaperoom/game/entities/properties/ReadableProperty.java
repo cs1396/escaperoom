@@ -48,13 +48,10 @@ public class ReadableProperty extends ItemProperty<ReadableContents> {
 
     public ActionResult act(GameContext ctx) {
       return new ActionResult().showsDialog(
-        new GameDialog(
-          new G24Label(contents.getValue()),
-          ctx.player,
-          title
-        )
-
-      );
+          new GameDialog.Builder(title, ctx.player)
+            .withContent(new G24Label(contents.getValue()))
+            .build()
+        );
     }
 
     public String getActionName() {
