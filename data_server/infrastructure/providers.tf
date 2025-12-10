@@ -16,7 +16,5 @@ provider "aws" {
 }
 
 provider "mongodbatlas" {
-  assume_role {
-    role_arn = "arn:aws:iam::442426877818:role/GithubAction-Deployments"
-  }
+  assume_role { }
 }
