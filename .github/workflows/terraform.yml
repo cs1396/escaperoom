@@ -43,7 +43,6 @@ jobs:
         role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ env.AWS_REGION }}
-        output-credentials: true
 
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
