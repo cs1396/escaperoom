@@ -35,6 +35,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    # Read and load aws credentials
+    - name: Load AWS Account
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
+
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
@@ -49,19 +57,13 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      uses: aws-actions/configure-aws-credentials@v1.7.0
-      with:
-        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
-        role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: ${{ env.AWS_REGION }}
       run: terraform plan -input=false
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
-      uses: aws-actions/configure-aws-credentials@v1.7.0
-      with:
-        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
-        role-session-name: GitHub_to_AWS_via_FederatedOIDC
-        aws-region: ${{ env.AWS_REGION }}
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
       run: terraform apply -auto-approve -input=false
