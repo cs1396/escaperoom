@@ -16,5 +16,7 @@ provider "aws" {
 }
 
 provider "mongodbatlas" {
-  # creds in env
+  assume-role {
+    role-arm = "arn:aws:iam::442426877818:role/GithubAction-Deployments"
+  }
 }
