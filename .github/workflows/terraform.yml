@@ -32,7 +32,7 @@ jobs:
 
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
         tf_actions_working_dir: 'data_server/infrastructure'
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
@@ -42,17 +42,41 @@ jobs:
 
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
+      with:
+        tf_actions_working_dir: 'data_server/infrastructure'
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       run: terraform init
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
+      with:
+        tf_actions_working_dir: 'data_server/infrastructure'
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       run: terraform fmt -check
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
+      with:
+        tf_actions_working_dir: 'data_server/infrastructure'
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       run: terraform plan -input=false
 
       # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
+      with:
+        tf_actions_working_dir: 'data_server/infrastructure'
+        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
