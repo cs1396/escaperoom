@@ -1,0 +1,12 @@
+{
+  "env": "lambda",
+  "port": 8000,
+  "s3_bucket": "escaperoom-files",
+  "mongo_db": {
+    "db_name": "MapData",
+    "collections": {
+      "map_metadata": "metadata",
+      "player_records": "player_records"
+    }
+  }
+}
