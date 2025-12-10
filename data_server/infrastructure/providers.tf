@@ -16,5 +16,5 @@ provider "aws" {
 }
 
 provider "mongodbatlas" {
-  assume_role { }
+  assume_role {}
 }
