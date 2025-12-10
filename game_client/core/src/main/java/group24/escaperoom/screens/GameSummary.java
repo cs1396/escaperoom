@@ -25,10 +25,11 @@ import group24.escaperoom.services.Networking;
 import group24.escaperoom.services.User;
 import group24.escaperoom.services.MapUploader.UploadOutput;
 import group24.escaperoom.services.Networking.StatusCode;
-import group24.escaperoom.ui.MapDescriptionDialog;
+import group24.escaperoom.ui.ConfirmDialog;
 import group24.escaperoom.ui.StatTable;
 import group24.escaperoom.ui.notifications.Notifier;
 import group24.escaperoom.ui.widgets.G24TextButton;
+import group24.escaperoom.ui.widgets.G24TextInput;
 
 public class GameSummary extends MenuScreen {
   private StatTable statTable;
@@ -75,7 +76,6 @@ public class GameSummary extends MenuScreen {
         } else {
           Notifier.info("Successfully uploaded your attempt!");
         }
-        return null;
       }, "Uploading your attempt");
     }
 
@@ -222,26 +222,42 @@ public class GameSummary extends MenuScreen {
           if (UploadButton.this.isChecked()) {
             UploadButton.this.setChecked(false);
 
-            new MapDescriptionDialog((desc) -> {
-              previousMetadata.stats = Optional.of(MapStats.fromGameStats(stats));
-              previousMetadata.stats.get().description = desc;
-              waitFor(MapUploader.uploadMap(previousMetadata), (UploadOutput output) -> {
-                output.reason.ifPresent((err) -> {
-                  Notifier.error(err);
-                });
+            G24TextInput userInput = new G24TextInput();
+            userInput.setMultiline(true);
+            userInput.setPrefRows(3);
+            userInput.setMaxLength(200);
 
-                output.response.ifPresent((rsp) -> {
-                  Notifier.info(String.format("%s successfully uploaded!", previousMetadata.name));
-                  previousMetadata.mapID = rsp.mapID;
-                  if (!MapSaver.updateMetadata(previousMetadata)) {
-                    Notifier.warn(String.format("%s failed to update metadata!", previousMetadata.name));
+            new ConfirmDialog.Builder("Description for your new map:")
+                .withContent(new ConfirmDialog.Content(userInput, true, Align.center))
+                .onConfirm(() -> {
+                  String desc = userInput.getText();
+                  if (desc.isEmpty() || desc.isBlank()) {
+                    Notifier.error("Please enter a description!", userInput);
+                    return false;
                   }
-                  UploadButton.this.setDisabled(true);
-                });
-                return null;
-              }, "Uploading");
-              return null;
-            }).show(getStage());
+
+                  previousMetadata.stats = Optional.of(MapStats.fromGameStats(stats));
+                  previousMetadata.stats.get().description = desc;
+
+                  waitFor(MapUploader.uploadMap(previousMetadata), (UploadOutput output) -> {
+                    output.reason.ifPresent((err) -> {
+                      Notifier.error(err);
+                    });
+
+                    output.response.ifPresent((rsp) -> {
+                      Notifier.info(String.format("%s successfully uploaded!", previousMetadata.name));
+                      previousMetadata.mapID = rsp.mapID;
+                      if (!MapSaver.updateMetadata(previousMetadata)) {
+                        Notifier.warn(String.format("%s failed to update metadata!", previousMetadata.name));
+                      }
+                      UploadButton.this.setDisabled(true);
+                    });
+                  }, "Uploading");
+                  return true;
+                })
+                .disableSpawner(UploadButton.this)
+                .build()
+                .show(getUIStage());
           }
         }
       });

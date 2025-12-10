@@ -41,7 +41,7 @@ public class PassphraseLock extends LockingMethod implements StringItemPropertyV
         return ActionResult.DEFAULT;
       }
 
-      GameDialog dialog = new GameDialog(ctx.player, "Enter Passphrase");
+      GameDialog dialog = new GameDialog.Builder("Enter Passphrase", ctx.player).build();
 
       Table table = new Table();
       G24TextInput[] chars = new G24TextInput[passphrase.length()];
@@ -107,7 +107,7 @@ public class PassphraseLock extends LockingMethod implements StringItemPropertyV
       table.add(submitButton).align(Align.center).colspan(chars.length);
       table.row();
 
-      dialog.setContent(table);
+      dialog.getContentTable().add(table).center();
       return new ActionResult().showsDialog(dialog);
     }
 

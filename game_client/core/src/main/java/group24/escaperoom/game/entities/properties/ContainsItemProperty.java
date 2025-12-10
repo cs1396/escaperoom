@@ -71,7 +71,9 @@ public class ContainsItemProperty
         }
       }
       return new ActionResult().showsDialog(
-        new GameDialog(new ContainerUI(ContainsItemProperty.this, ctx.player), ctx.player, "Contained...")
+          new GameDialog.Builder("Contained...", ctx.player)
+            .withContent(new ContainerUI( ContainsItemProperty.this, ctx.player))
+            .build()
       );
     }
 

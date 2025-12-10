@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 
@@ -38,6 +39,7 @@ import group24.escaperoom.ui.widgets.G24Label;
 import group24.escaperoom.ui.widgets.G24NumberInput.IntInput;
 import group24.escaperoom.ui.widgets.G24TextButton;
 import group24.escaperoom.ui.widgets.G24TextInput;
+import group24.escaperoom.ui.widgets.G24Dialog.Content;
 
 public class MapSelectScreen extends MenuScreen {
 
@@ -152,13 +154,13 @@ public class MapSelectScreen extends MenuScreen {
               G24TextInput nameInput = new G24TextInput();
 
               new ConfirmDialog.Builder("Copy Map")
-                .withContent(new G24Label("Copy Name:", "underline"), false)
-                .withContent(nameInput, false)
+                .withContent(new G24Label("Copy Name:", "underline"))
+                .withContent(nameInput)
                 .confirmText("Copy")
                 .onConfirm(() -> {
                   String newName = nameInput.getText();
                   if (newName.isBlank() || newName.isEmpty()){
-                    Notifier.warn("No name provided!");
+                    Notifier.warn("No name provided!", nameInput);
                     return false;
                   }
 
@@ -194,42 +196,24 @@ public class MapSelectScreen extends MenuScreen {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
             if (DeleteButton.this.isChecked()) {
-              G24Dialog dialog = new G24Dialog("Are you sure?");
-              dialog.getContentTable().defaults().padLeft(10).padRight(10);
-              dialog.getContentTable().add(new G24Label(
-                  "Are you sure you want to delete " + MapEntry.this.data.name + "?"));
-              dialog.getContentTable().row();
-              dialog.getContentTable().add(
-                  new G24Label("This will delete any custom object data or textures in this directory", "underline"));
-              dialog.getContentTable().row();
-              dialog.getContentTable().add(new G24Label("This cannot be undone", "underline"));
-              G24TextButton confirmButton = new G24TextButton("Delete");
-              dialog.getButtonTable().add(confirmButton);
-
-              confirmButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
+              new ConfirmDialog.Builder("Are you sure?")
+                .withContent(new Content(new G24Label(
+                  "Are you sure you want to delete " + MapEntry.this.data.name + "?"), true, Align.center))
+                .withContent(new Content(new G24Label(
+                  "This will delete any custom object data or textures in this directory"), true, Align.center))
+                .withContent(new Content(new G24Label(
+                  "This cannot be undone", "underline"), true, Align.center))
+                .confirmText("Delete")
+                .onConfirm(() -> {
                   MapSaver.deleteMap(MapEntry.this.data);
                   MapEntry.this.remove();
                   MapSelectScreenBuilder.maps.removeValue(MapEntry.this.data, false);
-                  dialog.hide();
                   Notifier.info("Successfully deleted map.");
-                }
-              });
-
-              G24TextButton cancelButton = new G24TextButton("Cancel");
-              dialog.getButtonTable().add(cancelButton);
-              cancelButton.addListener(new ChangeListener() {
-
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                  DeleteButton.this.setChecked(false);
-                  dialog.hide();
-                }
-
-              });
-
-              dialog.show(DeleteButton.this.getStage());
+                  return true;
+                })
+                .disableSpawner(DeleteButton.this)
+                .build()
+                .show(DeleteButton.this.getStage());
             }
           }
         });
@@ -258,7 +242,6 @@ public class MapSelectScreen extends MenuScreen {
                   Notifier.info(String.format("%s successfully uploaded!", data.name));
                   System.out.println("MapID: `%s`\n");
                 });
-                return null;
               }, "Uploading");
             }
           }
@@ -291,7 +274,6 @@ public class MapSelectScreen extends MenuScreen {
                   DownloadButton.this.setDisabled(true);
                   Notifier.info(String.format("%s successfully downloaded!", data.name));
                 });
-                return null;
               }, "Downloading " + data.name);
             }
           }
@@ -501,7 +483,7 @@ public class MapSelectScreen extends MenuScreen {
   }
 
   private class CreateNewMapButton extends G24TextButton {
-    private ConfirmDialog getConfirmDialog(){
+    private G24Dialog getConfirmDialog(){
       G24Label nameLabel = new G24Label("Map Name", "underline");
       G24TextInput mapNameInput = new G24TextInput();
       mapNameInput.setFilter(
@@ -520,7 +502,7 @@ public class MapSelectScreen extends MenuScreen {
         s.height = val;
       });
 
-      ConfirmDialog d = new ConfirmDialog.Builder("Create a new Map")
+      G24Dialog d = new ConfirmDialog.Builder("Create a new Map")
           .disableSpawner(this)
           .onConfirm(() -> {
             String newMap = mapNameInput.getText();

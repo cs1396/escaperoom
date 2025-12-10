@@ -3,7 +3,6 @@ package group24.escaperoom.game.ui;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import group24.escaperoom.game.entities.player.Player;
@@ -19,23 +18,25 @@ public class GameDialog extends G24Dialog {
   Player player;
   Vector2 playerPos;
 
-  public void setContent(Actor a){
-    getContentTable().add(a).center();
-  }
-
-  public GameDialog(Player player, String title) {
-    super(title);
+  protected GameDialog(Builder builder) {
+    super(builder);
     setModal(false);
 
-    this.player = player;
+    this.player = builder.player;
     this.playerPos = player.getCenter();
     button(new G24TextButton("Continue..."));
   }
 
-  public GameDialog(Actor a, Player player, String title) {
-    this(player, title);
+  public static class Builder extends AbstractBuilder<GameDialog, Builder> {
+    protected Player player;
 
-    setContent(a);
+    public Builder(String title, Player player){
+      super(title);
+      this.player = player;
+    }
+
+    protected Builder self() { return this; }
+    public GameDialog build() { return new GameDialog(this); }
   }
 
   @Override

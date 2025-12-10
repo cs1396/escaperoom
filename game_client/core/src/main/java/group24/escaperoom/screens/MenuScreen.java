@@ -27,13 +27,13 @@ public abstract class MenuScreen extends AbstractScreen {
     addUI(rootTable);
   }
 
-  public <T> void waitFor(CompletableFuture<T> future, Function<T, Void> onComplete, Actor loadActor) {
+  public <T> void waitFor(CompletableFuture<T> future, CompletionHandler<T> onComplete, Actor loadActor) {
     rootTable.remove();
     addUI(loadActor);
 
     future.thenAccept((T t) -> {
       Gdx.app.postRunnable(() -> {
-        onComplete.apply(t);
+        onComplete.handle(t);
         loadActor.remove();
         addUI(rootTable);
       });
@@ -41,11 +41,15 @@ public abstract class MenuScreen extends AbstractScreen {
 
   }
 
+  public interface CompletionHandler<T> {
+    public void handle(T result);
+  }
+
   /**
    * Given some future, wait for that future off the render thread then run
    * {@code onComplete} on its result on the render thread
    */
-  public <T> void waitFor(CompletableFuture<T> future, Function<T, Void> onComplete, String loadMessage) {
+  public <T> void waitFor(CompletableFuture<T> future, CompletionHandler<T> onComplete, String loadMessage) {
     G24Label l = new G24Label(loadMessage, "bubble");
     l.setPosition(getUIStage().getWidth() / 2, getUIStage().getHeight() / 2, Align.center);
     l.pack();
@@ -85,7 +89,7 @@ public abstract class MenuScreen extends AbstractScreen {
    * {@link MenuScreen#waitFor(CompletableFuture, Function, String)} to specify
    * the load message
    */
-  public <T> void waitFor(CompletableFuture<T> future, Function<T, Void> onComplete) {
+  public <T> void waitFor(CompletableFuture<T> future, CompletionHandler<T> onComplete) {
     waitFor(future, onComplete, "Loading");
 
   }

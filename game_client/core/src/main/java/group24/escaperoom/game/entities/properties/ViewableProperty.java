@@ -21,6 +21,7 @@ import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.entities.properties.values.ImageValue;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.ui.GameDialog;
+import group24.escaperoom.ui.widgets.G24Dialog.Content;
 
 public class ViewableProperty extends ItemProperty<ImageValue> {
 
@@ -118,7 +119,11 @@ public class ViewableProperty extends ItemProperty<ImageValue> {
     public ActionResult act(GameContext ctx) {
       Texture texture = new Texture(value.inner);
       texture.draw(value.inner, 0, 0);
-      return new ActionResult().showsDialog(new GameDialog(new Image(texture), ctx.player, "Viewing" + owner.getItemName()));
+      return new ActionResult().showsDialog(
+          new GameDialog.Builder(
+            "Viewing " + owner.getItemName(),
+          ctx.player
+          ).withContent(new Image(texture)).build());
     }
 
     @Override

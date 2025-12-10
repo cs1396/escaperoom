@@ -43,8 +43,6 @@ public class Leaderboard extends MenuScreen {
           for (PlayerRecord data : rsp.records) {
             addEntry(data);
           }
-
-          return null;
         }, "Applying filters...");
     return null;
   };
@@ -134,7 +132,6 @@ public class Leaderboard extends MenuScreen {
           rootTable.add(filterButton).bottom().right().expand();
           filterUI.setVisible(false);
           addUI(filterUI);
-          return null;
         }, "Fetching maps...");
   }
 }

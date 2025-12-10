@@ -30,8 +30,6 @@ public class Marketplace extends MapSelectScreen {
             entriesUI.addActor(e);
             entries.add(e);
           }
-
-          return null;
         }, "Applying filters...");
     return null;
   };
@@ -64,7 +62,6 @@ public class Marketplace extends MapSelectScreen {
           rootTable.add(filterButton).bottom().right().expand();
           filterUI.setVisible(false);
           addUI(filterUI);
-          return null;
         }, "Fetching maps...");
   }
 }
