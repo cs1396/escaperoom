@@ -50,6 +50,8 @@ jobs:
 
     # Build using the makefile
     - name: Build Server
+      with:
+        working-directory: "data_server"
       run: make build
 
     # Install the latest version of Terraform CLI and configure
