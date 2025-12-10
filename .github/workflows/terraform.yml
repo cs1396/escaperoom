@@ -48,6 +48,10 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ env.AWS_REGION }}
 
+    # Build using the makefile
+    - name: Build Server
+      run: make build
+
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3

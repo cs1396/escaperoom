@@ -5,10 +5,5 @@ build: clean
 	cp config/deploy.json build/config/config.json
 	cd build; zip server.zip bootstrap config/config.json
 
-infra:
-	cd infrastructure; terraform fmt; terraform apply
-
-deploy: build infra
-
 clean:
 	rm -rf build
