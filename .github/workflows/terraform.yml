@@ -25,6 +25,9 @@ jobs:
       run:
         working-directory: "data_server/infrastructure"
         shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
 
     steps:
     # Checkout the repository to the GitHub Actions runner
@@ -34,9 +37,6 @@ jobs:
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
 
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
