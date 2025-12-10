@@ -13,6 +13,10 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+
+env:
+  AWS_REGION : "us-east-2"
 
 jobs:
   terraform:
@@ -30,6 +34,14 @@ jobs:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
+
+    # Read and load aws credentials
+    - name: Load AWS Account
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
 
     # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
@@ -50,7 +62,4 @@ jobs:
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       run: terraform apply -auto-approve -input=false
