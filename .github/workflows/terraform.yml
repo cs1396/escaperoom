@@ -14,10 +14,6 @@ on:
 permissions:
   contents: read
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
-
 jobs:
   terraform:
     name: 'Terraform'
@@ -42,7 +38,6 @@ jobs:
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
       run: terraform init
-           echo "${{secrets.AWS_ACCESS_KEY_ID}}"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
@@ -55,4 +50,7 @@ jobs:
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_ACCESS_KEY_SECRET: ${{ secrets.AWS_ACCESS_KEY_SECRET }}
       run: terraform apply -auto-approve -input=false
