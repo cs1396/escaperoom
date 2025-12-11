@@ -9,6 +9,7 @@ name: 'Deploy Server'
 on:
   pull_request:
     types: [ "closed" ]
+    paths: [ "data_server/**" ]
 
 permissions:
   contents: read
