@@ -4,12 +4,10 @@
 #
 # Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
 
-name: 'Deploy Server'
+name: 'Plan Server'
 
 on:
   pull_request:
-    branches: [ "main" ]
-    types: [ "closed" ]
     paths: [ "data_server/**" ]
 
 permissions:
@@ -23,8 +21,7 @@ env:
 
 jobs:
   terraform:
-    if: github.event.pull_request.merged == true
-    name: "Deploy Server"
+    name: "Plan Server"
     runs-on: ubuntu-latest
     environment: production
 
@@ -58,7 +55,7 @@ jobs:
       uses: hashicorp/setup-terraform@v3
 
     # Initialize a new or existing Terraform working directory
-    - name: Terraform Deploy
+    - name: Plan Terraform
       run: |
         terraform init
-        terraform apply -auto-approve -input=false
+        terraform plan -input=false
