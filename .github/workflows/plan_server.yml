@@ -56,8 +56,6 @@ jobs:
 
     # Initialize a new or existing Terraform working directory
     - name: Terraform Init
-      run: terraform init
-
-    # Generates an execution plan for Terraform
-    - name: Terraform Plan
-      run: terraform plan -input=false
+      run: |
+        terraform init
+        terraform plan -input=false
