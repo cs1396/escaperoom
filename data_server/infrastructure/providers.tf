@@ -16,5 +16,5 @@ provider "aws" {
 }
 
 provider "mongodbatlas" {
-  # through env
+  # gotten through env
 }
