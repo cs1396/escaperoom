@@ -8,7 +8,7 @@ name: 'Deploy Server'
 
 on:
   pull_request:
-    types: [ "closed" ]
+    paths: [ "data_server/**" ]
 
 permissions:
   contents: read
@@ -21,7 +21,6 @@ env:
 
 jobs:
   terraform:
-    if: github.event.pull_request.merged == true
     name: "Deploy Server"
     runs-on: ubuntu-latest
     environment: production
@@ -59,6 +58,6 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    # Deploy the changes
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -input=false
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false
