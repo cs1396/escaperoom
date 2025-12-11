@@ -7,7 +7,7 @@ import group24.escaperoom.game.entities.Item;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.screens.MapScreen;
-import group24.escaperoom.game.entities.properties.ConnectorSink;
+import group24.escaperoom.game.entities.properties.connectors.ConnectorSink;
 
 public class ItemsArePowered extends RequiresItems {
 

@@ -1,9 +1,9 @@
-package group24.escaperoom.game.entities.properties;
+package group24.escaperoom.game.entities.properties.connectors;
 
 import java.util.HashSet;
 
 import group24.escaperoom.engine.types.IntVector2;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
 
@@ -76,6 +76,7 @@ public class ConnectorBridge extends Connector {
 
   public void propagate(GameContext ctx, HashSet<Integer> seen) {
     if (seen.contains(owner.getID())) return;
+
     seen.add(owner.getID());
 
     IntVector2 position = owner.getPosition();
@@ -86,7 +87,7 @@ public class ConnectorBridge extends Connector {
     pos.y += output.y;
     pos.x += output.x;
 
-    Connectable.Utils.connectableAt(pos, ctx.map, type)
+    Utils.connectableAt(pos, ctx.map, type)
       .ifPresent(ci -> ci.connectable.acceptSignalFrom(this, position, ctx, seen));
   }
 

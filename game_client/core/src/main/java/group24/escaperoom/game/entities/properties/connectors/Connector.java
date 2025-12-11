@@ -1,4 +1,4 @@
-package group24.escaperoom.game.entities.properties;
+package group24.escaperoom.game.entities.properties.connectors;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import group24.escaperoom.editor.ui.PropertyConfiguration;
 import group24.escaperoom.editor.ui.PropertyConfiguration.Select;
 import group24.escaperoom.engine.types.IntVector2;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.PhantomProperty;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
@@ -60,7 +60,7 @@ public class Connector extends PhantomProperty implements Connectable {
         pos.x += xoff;
         pos.y += yoff;
 
-        Connectable.Utils.connectableAt(pos, ctx.map, type)
+        Utils.connectableAt(pos, ctx.map, type)
             .ifPresent(ci -> ci.connectable.acceptSignalFrom(this, position, ctx, seen));
       }
     }

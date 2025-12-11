@@ -38,7 +38,7 @@ import group24.escaperoom.engine.types.Size;
 import group24.escaperoom.game.entities.Item;
 import group24.escaperoom.game.entities.properties.ConditionallyActive;
 import group24.escaperoom.game.entities.properties.PropertyType;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.connectors.Utils;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.world.Grid;
 import group24.escaperoom.game.world.Grid.Tile;
@@ -69,7 +69,7 @@ public abstract class MapScreen extends AbstractScreen {
     if (this instanceof GameScreen) {
       GameContext ctx = new GameContext((GameScreen) this);
       // Set false on removal of a connectable, this may or may not propage the signal
-      Connectable.Utils.isConnectable(item).ifPresent((ci) -> {
+      Utils.isConnectable(item).ifPresent((ci) -> {
         ci.connectable.setActive(false, ctx);
       });
     }
@@ -82,7 +82,7 @@ public abstract class MapScreen extends AbstractScreen {
     grid.removeItem(item);
 
     // Try and update textures
-    Connectable.Utils.maybeUpateSurroundingTileables(item, this);
+    Utils.maybeUpateSurroundingTileables(item, this);
   }
 
   /**

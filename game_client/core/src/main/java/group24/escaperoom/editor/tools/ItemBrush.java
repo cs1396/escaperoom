@@ -9,8 +9,9 @@ import com.badlogic.gdx.utils.Array;
 import group24.escaperoom.editor.core.DragManager.PlacementAction;
 import group24.escaperoom.engine.types.IntVector2;
 import group24.escaperoom.game.entities.Item;
-import group24.escaperoom.game.entities.properties.base.Connectable;
-import group24.escaperoom.game.entities.properties.base.Connectable.ConnectableItem;
+import group24.escaperoom.game.entities.properties.connectors.Connectable;
+import group24.escaperoom.game.entities.properties.connectors.ConnectableItem;
+import group24.escaperoom.game.entities.properties.connectors.Utils;
 import group24.escaperoom.screens.LevelEditor;
 import group24.escaperoom.screens.MapScreen;
 
@@ -97,7 +98,7 @@ public class ItemBrush extends Brush {
   static protected Optional<Item> matchingItemAt(IntVector2 checkPos, IntVector2 matchToPos, MapScreen editor,
       Item itemToMatch) {
 
-    Optional<Connectable.ConnectableItem> maybeConnectable = Connectable.Utils.isConnectable(itemToMatch);
+    Optional<ConnectableItem> maybeConnectable = Utils.isConnectable(itemToMatch);
 
     // if the item is connectable, match on the ConnectorType
     if (maybeConnectable.isPresent()) {
@@ -110,7 +111,7 @@ public class ItemBrush extends Brush {
 
           Item canidate = canidates[i];
 
-          Optional<ConnectableItem> maybeConnectableCanidate = Connectable.Utils.isConnectable(canidate)
+          Optional<ConnectableItem> maybeConnectableCanidate = Utils.isConnectable(canidate)
               .filter((ci) -> ci.connectable.getConnectorType() == itemToMatchConnectable.getConnectorType());
 
           if (maybeConnectableCanidate.isPresent()){

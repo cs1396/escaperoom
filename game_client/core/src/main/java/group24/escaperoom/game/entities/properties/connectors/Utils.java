@@ -1,38 +1,20 @@
-package group24.escaperoom.game.entities.properties.base;
+package group24.escaperoom.game.entities.properties.connectors;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Optional;
 
 import group24.escaperoom.editor.tools.TiledBrush;
 import group24.escaperoom.engine.types.IntVector2;
 import group24.escaperoom.game.entities.Item;
-import group24.escaperoom.game.entities.properties.Connector;
-import group24.escaperoom.game.entities.properties.Connector.ConnectorType;
-import group24.escaperoom.game.entities.properties.ConnectorBridge;
-import group24.escaperoom.game.entities.properties.ConnectorRelay;
-import group24.escaperoom.game.entities.properties.ConnectorSink;
-import group24.escaperoom.game.entities.properties.ConnectorSource;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.TiledBrushable;
+import group24.escaperoom.game.entities.properties.base.ItemProperty;
+import group24.escaperoom.game.entities.properties.connectors.Connector.ConnectorType;
 import group24.escaperoom.game.entities.properties.values.ItemPropertyValue;
-import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.screens.GameScreen;
 import group24.escaperoom.screens.MapScreen;
 
-public interface Connectable {
-
-  public static final class ConnectableItem {
-    public final Item item;
-    public final Connectable connectable;
-
-    public ConnectableItem(Item item, Connectable connectable) {
-      this.item = item;
-      this.connectable = connectable;
-    }
-  }
-
-  public static final class Utils {
+public final class Utils {
 
     public static Optional<ConnectableItem> isConnectable(Item i) {
       for (ConnectorType t : ConnectorType.values()) {
@@ -162,58 +144,3 @@ public interface Connectable {
       });
     }
   }
-
-  public static final IntVector2[] defaultConnectionDirections = { 
-      new IntVector2(-1, 1), new IntVector2(0, 1), new IntVector2(1, 1), 
-      new IntVector2(-1, 0),  new IntVector2(1, 0),
-      new IntVector2(-1, -1), new IntVector2(0, -1), new IntVector2(1, -1), 
-  };
-
-  /**
-   * Potentially propagate the the connectors current siganl
-   * 
-   * @param seen is IDs of all {@code Connectable} items which have already
-   *             propagated
-   */
-  public void propagate(GameContext ctx, HashSet<Integer> seen);
-
-
-  /**
-   * By default, connectable items connect visually to 8 directions. 
-   *
-   *  ^   ^   ^
-   *  ^   me  ^ 
-   *  ^   ^   ^
-   *
-   *  Override this method to change visual connection directions
-   */
-  default public IntVector2[] connectionDirections(){
-    return defaultConnectionDirections;
-  }
-
-  /**
-   * Called when this {@code Connectable} receives a signal from another.
-   * 
-   * @param source the Connectable sending the signal
-   * @param pos    the source's position
-   * @param seen   A set of already visited IDs
-   */
-  public void acceptSignalFrom(Connectable source, IntVector2 pos, GameContext ctx, HashSet<Integer> seen);
-
-  /**
-   * Set the {@code Connectable} to be {@code connected}
-   *
-   * This may or may not propagate the signal
-   */
-  public void setActive(boolean connected, GameContext ctx);
-
-  /**
-   * Get the type of connector.
-   */
-  public ConnectorType getConnectorType();
-
-  /**
-   * Get whether or not this Connectable is connected (active)
-   */
-  public boolean isConnected();
-}

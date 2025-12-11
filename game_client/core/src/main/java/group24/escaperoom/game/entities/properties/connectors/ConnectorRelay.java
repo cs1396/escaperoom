@@ -1,4 +1,4 @@
-package group24.escaperoom.game.entities.properties;
+package group24.escaperoom.game.entities.properties.connectors;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import group24.escaperoom.editor.ui.Menu.MenuEntry;
 import group24.escaperoom.editor.ui.PropertyConfiguration;
 import group24.escaperoom.editor.ui.PropertyConfiguration.Select;
 import group24.escaperoom.engine.types.IntVector2;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.entities.properties.values.PhantomPropertyValue;
 import group24.escaperoom.game.entities.properties.values.StringItemPropertyValue;
@@ -297,7 +297,7 @@ public class ConnectorRelay extends Connector {
     pos = position.cpy();
     pos.x += outputDirs.offsetX;
     pos.y += outputDirs.offsetY;
-    Connectable.Utils.connectableAt(pos, ctx.map, type).ifPresent((i) -> {
+    Utils.connectableAt(pos, ctx.map, type).ifPresent((i) -> {
       if (!seen.contains(i.item.getID())) {
         i.connectable.acceptSignalFrom(this, position, ctx, seen);
       }
@@ -343,7 +343,7 @@ public class ConnectorRelay extends Connector {
     cpy.x += input1Dir.offsetX;
     cpy.y += input1Dir.offsetY;
 
-    Connectable.Utils.connectableAt(cpy, ctx.map, getConnectorType()).ifPresent((c) -> {
+    Utils.connectableAt(cpy, ctx.map, getConnectorType()).ifPresent((c) -> {
       rlyCtx.input1 = c.connectable.isConnected();
     });
 
@@ -354,7 +354,7 @@ public class ConnectorRelay extends Connector {
       cpy2.x += input2.offsetX;
       cpy2.y += input2.offsetY;
 
-      Connectable.Utils.connectableAt(cpy2, ctx.map, getConnectorType()).ifPresent((c) -> {
+      Utils.connectableAt(cpy2, ctx.map, getConnectorType()).ifPresent((c) -> {
         rlyCtx.input2 = c.connectable.isConnected();
       });
     });
