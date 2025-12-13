@@ -17,7 +17,6 @@ import group24.escaperoom.game.entities.properties.values.ContainedItem;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;
 import group24.escaperoom.game.state.GameEvent.EventType;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.ui.ContainerUI;
 import group24.escaperoom.game.ui.GameDialog;
 import group24.escaperoom.game.world.Grid;
@@ -62,7 +61,7 @@ public class ContainsItemProperty
         if (unlockAction != null) unlockAction.act(ctx);
 
         if (lockedProp.isLocked()){
-          GameEventBus.get().post(
+          ctx.map.getEventBus().post(
             new GameEvent.Builder(EventType.ItemStateChange, ctx)
               .message("Can't open " + owner.getItemName() + ", it is still locked!")
               .build()

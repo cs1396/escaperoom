@@ -3,8 +3,8 @@ package group24.escaperoom.game.ui;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.screens.AbstractScreen;
+import group24.escaperoom.screens.GameScreen;
 import group24.escaperoom.ui.widgets.G24Label;
 
 /**
@@ -18,7 +18,7 @@ public class ActionLog extends ScrollPane {
   /**
    * 
    */
-  public ActionLog() {
+  public ActionLog(GameScreen screen) {
     super(null, AbstractScreen.skin);
     setStyle(AbstractScreen.skin.get("transparent", ScrollPaneStyle.class));
     inner = new Table();
@@ -29,7 +29,7 @@ public class ActionLog extends ScrollPane {
     setActor(inner);
     this.pack();
 
-    GameEventBus.get().addListener((ev) -> {
+    screen.getEventBus().addListener((ev) -> {
       String message = ev.toString();
       if (!message.isEmpty()){
         emit(message);

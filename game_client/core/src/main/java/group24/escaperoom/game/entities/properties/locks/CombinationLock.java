@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -14,20 +13,25 @@ import group24.escaperoom.editor.ui.Menu;
 import group24.escaperoom.editor.ui.Menu.MenuEntry;
 import group24.escaperoom.editor.ui.Menu.MenuEntryBuilder;
 import group24.escaperoom.engine.BackManager;
-import group24.escaperoom.game.entities.player.PlayerAction;
 import group24.escaperoom.game.entities.properties.base.LockingMethod;
 import group24.escaperoom.game.entities.properties.values.StringItemPropertyValue;
 import group24.escaperoom.game.state.GameContext;
-import group24.escaperoom.game.state.GameEvent;
-import group24.escaperoom.game.state.GameEvent.EventType;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.ui.GameDialog;
 import group24.escaperoom.ui.widgets.G24NumberInput;
 import group24.escaperoom.ui.widgets.G24TextButton;
 import group24.escaperoom.ui.widgets.G24TextInput;
 
 public class CombinationLock extends LockingMethod implements StringItemPropertyValue {
-  protected class TryUnlock implements PlayerAction {
+
+  protected class LockAction extends AbstractLockAction {
+    @Override
+    public ActionResult act(GameContext ctx) {
+      updateLocked(ctx, true);
+      return ActionResult.DEFAULT;
+    }
+  }
+
+  protected class UnlockAction extends AbstractUnlockAction {
     @Override
     public String getActionName() {
       return "Enter combination";
@@ -64,34 +68,16 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
               result += input.getText();
             }
             if (result.equals(combination)) {
-              isLocked = false;
-              if (isBarrier) {
-                owner.ifPresent((i) -> {
-                  i.setBlocksPlayer(false);
-                  i.setAlpha(0.5f);
-                });
-              }
               submitButton.setDisabled(true);
               dialog.hide();
-              owner.ifPresent((i) -> {
-                GameEventBus.get().post(
-                  new GameEvent.Builder(EventType.ItemStateChange, ctx)
-                    .message(i.getItemName() + " clicked open...")
-                    .build()
-                );
-              });
+              updateLocked(ctx, false, "", owner.get().getItemName() + " clicked open...");
+
               if (actor.getStage().getKeyboardFocus() instanceof G24TextInput){
                 BackManager.goBack();
               }
               BackManager.goBack();
             } else {
-              owner.ifPresent((i) -> {
-                GameEventBus.get().post(
-                  new GameEvent.Builder(EventType.ItemStateChange, ctx)
-                    .message(i.getItemName() + " won't budge...")
-                    .build()
-                );
-              });
+              updateLocked(ctx, true, owner.get().getItemName() + " won't budge...", "");
             }
           }
           submitButton.setChecked(false);
@@ -107,11 +93,6 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
 
       dialog.getContentTable().add(table).center();
       return new ActionResult().showsDialog(dialog);
-    }
-
-    @Override
-    public boolean isValid(GameContext ctx) {
-      return isLocked();
     }
   };
 
@@ -179,11 +160,6 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
   }
 
   @Override
-  public Array<PlayerAction> getActions() {
-    return Array.with(new TryUnlock());
-  }
-
-  @Override
   public void write(Json json) {
     super.write(json);
     json.writeValue("combo", this.combination);
@@ -206,12 +182,12 @@ public class CombinationLock extends LockingMethod implements StringItemProperty
   }
 
   @Override
-  protected PlayerAction maybeGetLockAction() {
-    return null;
+  protected AbstractLockAction getLockAction() {
+    return new LockAction();
   }
 
   @Override
-  protected PlayerAction maybeGetUnlockAction() {
-    return new TryUnlock();
+  protected AbstractUnlockAction getUnlockAction() {
+    return new UnlockAction();
   }
 }

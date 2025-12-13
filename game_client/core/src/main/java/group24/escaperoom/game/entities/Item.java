@@ -811,7 +811,9 @@ public class Item implements Json.Serializable, Drawable {
    * @param color new color
    */
   public void setColor(Color color){
-    this.color = color;
+    this.color.r = color.r;
+    this.color.g = color.g;
+    this.color.b = color.b;
   }
 
   /**

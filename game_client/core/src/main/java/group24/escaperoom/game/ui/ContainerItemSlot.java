@@ -13,9 +13,9 @@ import group24.escaperoom.engine.control.CursorManager;
 import group24.escaperoom.engine.control.CursorManager.CursorType;
 import group24.escaperoom.game.entities.properties.ContainsItemProperty;
 import group24.escaperoom.game.entities.properties.values.ContainedItem;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.state.GameEvent.EventType;
 import group24.escaperoom.game.state.GameEventBus.GameEventListener;
+import group24.escaperoom.screens.GameScreen;
 import group24.escaperoom.game.entities.Item;
 import group24.escaperoom.game.entities.player.Player;
 import group24.escaperoom.ui.InteractableItemSlot;
@@ -71,22 +71,27 @@ public class ContainerItemSlot extends InteractableItemSlot {
         }
       };
     }
-    GameEventBus.get().addListener(listener, (ev) -> ev.type == EventType.ItemObtained);
-    actingPlayer.getGameScreen().getDragAndDrop().addSource(source);
-    actingPlayer.getGameScreen().getDragAndDrop().removeTarget(target);
+
+    GameScreen game = actingPlayer.getGameScreen();
+    game.getEventBus().addListener(listener, (ev) -> ev.type == EventType.ItemObtained);
+    game.getDragAndDrop().addSource(source);
+    game.getDragAndDrop().removeTarget(target);
+
     prop.addValue(new ContainedItem(i, prop.getOwner()));
   }
 
   @Override 
   public Item removeItemFromSlot(){
     Item removed = super.removeItemFromSlot();
-    actingPlayer.getGameScreen().getDragAndDrop().removeSource(source);
+    GameScreen gameScreen = actingPlayer.getGameScreen();
+    gameScreen.getDragAndDrop().removeSource(source);
     if (target == null){
       target = new ContainerItemSlotTarget(this);
     }
-    actingPlayer.getGameScreen().getDragAndDrop().addTarget(target);
+
+    gameScreen.getDragAndDrop().addTarget(target);
     prop.removeItem(removed);
-    GameEventBus.get().removeListener(listener);
+    gameScreen.getEventBus().removeListener(listener);
     return removed;
   }
 
@@ -135,7 +140,9 @@ public class ContainerItemSlot extends InteractableItemSlot {
         removeItemFromSlot();
       }
     };
-    GameEventBus.get().addListener(listener, (ev) -> ev.type == EventType.ItemObtained);
+    actingPlayer.getGameScreen()
+      .getEventBus()
+      .addListener(listener, (ev) -> ev.type == EventType.ItemObtained);
     actingPlayer.getGameScreen()
       .getDragAndDrop()
       .addSource(source);

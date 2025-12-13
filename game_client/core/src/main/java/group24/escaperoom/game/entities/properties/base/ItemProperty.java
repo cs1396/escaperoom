@@ -4,12 +4,14 @@ import java.util.Optional;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 
 import group24.escaperoom.editor.ui.ConfigurationMenu;
-import group24.escaperoom.editor.ui.ItemMenu;
-import group24.escaperoom.editor.ui.PropertyConfiguration;
 import group24.escaperoom.editor.ui.ConfigurationMenu.HandlesMenuClose;
+import group24.escaperoom.editor.ui.ItemMenu;
 import group24.escaperoom.editor.ui.Menu.MenuEntry;
+import group24.escaperoom.editor.ui.PropertyConfiguration;
 import group24.escaperoom.game.entities.Item;
 import group24.escaperoom.game.entities.player.PlayerAction;
 import group24.escaperoom.game.entities.properties.ConditionallyActive;
@@ -17,10 +19,8 @@ import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.values.BooleanValue;
 import group24.escaperoom.game.entities.properties.values.ItemPropertyValue;
 import group24.escaperoom.game.state.GameContext;
+import group24.escaperoom.screens.GameScreen;
 import group24.escaperoom.screens.ItemEditor;
-
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
 
 public abstract class ItemProperty<T extends ItemPropertyValue> implements Json.Serializable {
   protected Item owner;
@@ -247,4 +247,11 @@ public abstract class ItemProperty<T extends ItemPropertyValue> implements Json.
    * Typically used when reloading textures on already placed items.
    */
   public void updateTexture() { }
+
+  /**
+   * Called when this item is loaded onto into a {@link group24.escaperoom.screens.GameScreen}
+   *
+   * May be used to attach listeners to the {@link group24.escaperoom.game.state.GameEventBus}
+   */
+  public void onGameLoad(GameScreen screen) { }
 }

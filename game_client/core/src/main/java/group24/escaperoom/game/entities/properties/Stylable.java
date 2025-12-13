@@ -14,6 +14,8 @@ import group24.escaperoom.game.entities.properties.values.Style;
 public class Stylable extends ItemProperty<Style> {
   private Array<Style> availableStyles = new Array<>();
   private Style currentStyle;
+
+  @SuppressWarnings("unused")
   private Logger log = Logger.getLogger(Stylable.class.getName());
 
   private static final PropertyDescription description = new PropertyDescription(

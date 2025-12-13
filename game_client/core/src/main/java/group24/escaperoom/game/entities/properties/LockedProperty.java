@@ -17,6 +17,7 @@ import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.entities.properties.locks.LockingMethodType;
 import group24.escaperoom.game.entities.properties.locks.TrivialLock;
 import group24.escaperoom.game.entities.properties.util.PropertyMap;
+import group24.escaperoom.screens.GameScreen;
 
 public class LockedProperty extends ItemProperty<LockingMethod> {
 
@@ -166,6 +167,11 @@ public class LockedProperty extends ItemProperty<LockingMethod> {
   @Override
   public Class<LockingMethod> getValueClass() {
     return LockingMethod.class;
+  }
+
+  @Override
+  public void onGameLoad(GameScreen screen) {
+    currentMethod.onGameLoad(screen);
   }
 
   @Override

@@ -1,12 +1,9 @@
 package group24.escaperoom.screens;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -20,11 +17,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
 
 import group24.escaperoom.editor.events.EditorEvent;
 import group24.escaperoom.editor.events.EditorEvent.EventType;
@@ -36,8 +29,6 @@ import group24.escaperoom.engine.render.Drawable;
 import group24.escaperoom.engine.types.IntVector2;
 import group24.escaperoom.engine.types.Size;
 import group24.escaperoom.game.entities.Item;
-import group24.escaperoom.game.entities.properties.ConditionallyActive;
-import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.connectors.Utils;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.world.Grid;
@@ -53,7 +44,6 @@ public abstract class MapScreen extends AbstractScreen {
   protected final Batch batch;
   protected MapMetadata metadata;
   protected Size gridSize;
-  protected Array<Item> pollItems = new Array<>();
   protected CamMan cameraManager;
 
   public MapMetadata getMetadata() {
@@ -222,37 +212,6 @@ public abstract class MapScreen extends AbstractScreen {
     updateProxy();
     addUI(roomProxy);
     addActor(room);
-
-    addListener(new InputListener() {
-      @Override
-      public boolean keyTyped(InputEvent event, char character) {
-        // if (character == 'p') {
-        //   grid.printGrid();
-        //   return true;
-        // }
-        //
-        if (character == 'j') {
-          Json j = new Json();
-          String json = j.prettyPrint(MapScreen.this.grid);
-
-          if (json.length() > 10000){
-          File f = new File("/tmp/" + UUID.randomUUID().toString() + ".json");
-          try {
-            FileOutputStream fout = new FileOutputStream(f);
-            fout.write(json.getBytes());
-            fout.close();
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          System.out.println("file length over 10,000 -> wrote to: " + f.getAbsolutePath());
-          return true;
-          } else {
-            System.out.println(json);
-          }
-        }
-        return false;
-      }
-    });
   }
 
   public void loadGrid(Grid grid) {
@@ -261,27 +220,9 @@ public abstract class MapScreen extends AbstractScreen {
     this.grid = grid;
     for (Item item : grid.items.values()) {
       item.map = this;
-      maybeAddPolling(item);
     }
   }
 
-  /**
-   * Registers an Item for polling if it needs it.
-   *
-   * If called with an Item that doesn't need polling, this function does nothing.
-   */
-  public void maybeAddPolling(Item item) {
-    if (item.hasProperty(PropertyType.ConditionallyVisible)) {
-      pollItems.add(item);
-      return;
-    }
-
-    item.getProperty(PropertyType.ConditionallyActive, ConditionallyActive.class)
-      .ifPresent((ConditionallyActive ca) -> {
-        if (ca.requiresPoll()) pollItems.add(item);
-      }
-    );
-  }
 
   /**
    * @return all items associated with this map
