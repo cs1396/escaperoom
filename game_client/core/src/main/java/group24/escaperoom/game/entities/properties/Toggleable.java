@@ -11,6 +11,7 @@ import group24.escaperoom.game.entities.Item;
 import group24.escaperoom.game.entities.player.PlayerAction;
 import group24.escaperoom.game.entities.properties.base.PhantomProperty;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
+import group24.escaperoom.game.entities.properties.connectors.ConnectorSource;
 import group24.escaperoom.game.entities.properties.util.PropertyMap;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;

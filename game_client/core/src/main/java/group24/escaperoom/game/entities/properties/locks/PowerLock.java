@@ -3,7 +3,7 @@ package group24.escaperoom.game.entities.properties.locks;
 import com.badlogic.gdx.utils.Array;
 
 import group24.escaperoom.game.entities.player.PlayerAction;
-import group24.escaperoom.game.entities.properties.ConnectorSink;
+import group24.escaperoom.game.entities.properties.connectors.ConnectorSink;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.LockingMethod;
 import group24.escaperoom.game.state.GameContext;

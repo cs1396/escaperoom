@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 import group24.escaperoom.game.entities.properties.base.ItemProperty;
 import group24.escaperoom.game.entities.properties.base.PhantomProperty;
 import group24.escaperoom.game.entities.properties.values.ItemPropertyValue;
+import group24.escaperoom.game.entities.properties.connectors.*;
 
 
 /**

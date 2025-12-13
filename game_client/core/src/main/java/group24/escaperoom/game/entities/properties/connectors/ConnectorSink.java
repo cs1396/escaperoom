@@ -1,9 +1,9 @@
-package group24.escaperoom.game.entities.properties;
+package group24.escaperoom.game.entities.properties.connectors;
 
 import java.util.HashSet;
 
 import group24.escaperoom.engine.types.IntVector2;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
 

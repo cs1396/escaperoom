@@ -39,7 +39,7 @@ import group24.escaperoom.game.entities.properties.InteractableProperty;
 import group24.escaperoom.game.entities.properties.LockedProperty;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.TiledBrushable;
-import group24.escaperoom.game.entities.properties.base.Connectable;
+import group24.escaperoom.game.entities.properties.connectors.Utils;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.ui.ActionLog;
 import group24.escaperoom.game.ui.GameSettingsDialog;
@@ -487,7 +487,7 @@ public abstract class GameScreen extends MapScreen {
         grid.placeItem(inFlightItem);
       }
 
-      Connectable.Utils.maybeUpateSurroundingTileables(inFlightItem, GameScreen.this);
+      Utils.maybeUpateSurroundingTileables(inFlightItem, GameScreen.this);
       inFlightItem.getProperty(PropertyType.TiledBrushable, TiledBrushable.class).ifPresent((tbp) -> {
         tbp.refreshAdjacency(GameScreen.this);
       });
