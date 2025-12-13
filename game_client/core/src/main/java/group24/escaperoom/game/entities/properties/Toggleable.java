@@ -16,7 +16,6 @@ import group24.escaperoom.game.entities.properties.util.PropertyMap;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;
 import group24.escaperoom.game.state.GameEvent.EventType;
-import group24.escaperoom.game.state.GameEventBus;
 
 /**
  * An item implementing Toggleable should have a texture
@@ -34,7 +33,7 @@ public class Toggleable extends PhantomProperty {
 
   private void toggleTo(boolean toggleTo, GameContext ctx) {
     isToggled = toggleTo;
-    GameEventBus.get().post(
+    ctx.map.getEventBus().post(
       new GameEvent.Builder(EventType.ItemStateChange, ctx)
         .message(owner.getItemName() + " " + toggleVerb)
         .build()
@@ -59,7 +58,7 @@ public class Toggleable extends PhantomProperty {
         FragileProperty fp = ofp.get();
 
         if (fp.isBroken()) {
-          GameEventBus.get().post(
+          ctx.map.getEventBus().post(
             new GameEvent.Builder(EventType.ItemStateChange, ctx)
               .message(owner.getItemName() + " is broken and won't move")
               .build()
@@ -68,7 +67,7 @@ public class Toggleable extends PhantomProperty {
         }
 
         if (fp.isTrue()) {
-          GameEventBus.get().post(
+          ctx.map.getEventBus().post(
             new GameEvent.Builder(EventType.ItemStateChange, ctx)
               .message(owner.getItemName() + " was fragile and broke!")
               .build()
@@ -77,7 +76,7 @@ public class Toggleable extends PhantomProperty {
         }
 
       } else {
-        GameEventBus.get().post(
+        ctx.map.getEventBus().post(
           new GameEvent.Builder(EventType.ItemStateChange, ctx)
             .message(owner.getItemName() + " " + toggleVerb)
             .build()

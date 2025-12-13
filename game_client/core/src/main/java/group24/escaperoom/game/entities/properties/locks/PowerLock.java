@@ -1,66 +1,42 @@
 package group24.escaperoom.game.entities.properties.locks;
 
-import com.badlogic.gdx.utils.Array;
-
-import group24.escaperoom.game.entities.player.PlayerAction;
-import group24.escaperoom.game.entities.properties.connectors.ConnectorSink;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.LockingMethod;
+import group24.escaperoom.game.entities.properties.connectors.ConnectorSink;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;
-import group24.escaperoom.game.state.GameEvent.EventType;
-import group24.escaperoom.game.state.GameEventBus;
+import group24.escaperoom.game.state.GameEventBus.GameEventListener;
+import group24.escaperoom.screens.GameScreen;
 
 public class PowerLock extends LockingMethod {
 
-  protected class TryUnlock implements PlayerAction {
-    @Override
-    public String getActionName() {
-      return "Try to Unlock";
-    }
-
+  protected class UnlockAction extends AbstractUnlockAction {
     @Override
     public ActionResult act(GameContext ctx) {
-      if (ctx.player == null) {
-        return ActionResult.DEFAULT;
-      }
-
       owner.get().getProperty(PropertyType.ConnectorSink, ConnectorSink.class).ifPresent((csp) -> {
-        String eventMessage;
         if (csp.isConnected()) {
-          isLocked = false;
-          if (isBarrier) {
-            owner.get().setBlocksPlayer(false);
-            owner.get().setAlpha(0.5f);
-          }
-          eventMessage = owner.get().getItemName() + " is now unlocked!";
-        } else {
-          eventMessage = owner.get().getItemName() + " is still locked!";
-        }
-
-        GameEvent ev = new GameEvent.Builder(EventType.ItemStateChange, ctx)
-                                    .message(eventMessage)
-                                    .build();
-        GameEventBus.get().post(ev);
+          updateLocked(ctx, false);
+        } 
       });
-
       return ActionResult.DEFAULT;
     }
+  };
 
+  protected class LockAction extends AbstractLockAction {
     @Override
-    public boolean isValid(GameContext ctx) {
-      return isLocked();
+    public ActionResult act(GameContext ctx) {
+      owner.get().getProperty(PropertyType.ConnectorSink, ConnectorSink.class).ifPresent((csp) -> {
+        if (!csp.isConnected()) {
+          updateLocked(ctx, true);
+        } 
+      });
+      return ActionResult.DEFAULT;
     }
   };
 
   @Override
   public String getName() {
     return "Power Lock";
-  }
-
-  @Override
-  public Array<PlayerAction> getActions() {
-    return Array.with(new TryUnlock());
   }
 
   @Override
@@ -74,12 +50,36 @@ public class PowerLock extends LockingMethod {
   }
 
   @Override
-  protected PlayerAction maybeGetLockAction() {
-    return null;
+  protected AbstractLockAction getLockAction() {
+    return new LockAction();
   }
 
   @Override
-  protected PlayerAction maybeGetUnlockAction() {
-    return new TryUnlock();
+  protected AbstractUnlockAction getUnlockAction() {
+    return new UnlockAction();
+  }
+
+  /**
+   * Listen for {@link GameEvent}s to unlock and 
+   * relock when this owner becomes powered or unpowered
+   */
+  GameEventListener powerListener = event -> {
+    if (event.source != owner.get()) return; 
+
+    switch (event.type){
+      case ItemConnected:
+        new UnlockAction().act(event.ctx);
+        break;
+      case ItemDisconnected:
+        new LockAction().act(event.ctx);
+        break;
+      default:
+        break;
+    }
+  };
+
+  @Override
+  public void onGameLoad(GameScreen screen) {
+    screen.getEventBus().addListener(powerListener);
   }
 }

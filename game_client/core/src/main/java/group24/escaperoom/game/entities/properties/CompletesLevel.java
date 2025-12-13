@@ -3,7 +3,6 @@ package group24.escaperoom.game.entities.properties;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import group24.escaperoom.game.entities.player.PlayerAction;
@@ -13,7 +12,6 @@ import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.ui.GameDialog;
 import group24.escaperoom.screens.SinglePlayerGame;
 import group24.escaperoom.ui.widgets.G24TextButton;
-import group24.escaperoom.ui.widgets.G24Dialog.Content;
 
 public class CompletesLevel extends PhantomProperty {
   private static final PropertyDescription description = new PropertyDescription(

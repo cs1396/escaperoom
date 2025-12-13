@@ -6,6 +6,8 @@ import group24.escaperoom.engine.types.IntVector2;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
+import group24.escaperoom.game.state.GameEvent;
+import group24.escaperoom.game.state.GameEvent.EventType;
 
 public class ConnectorSink extends Connector {
 
@@ -28,9 +30,21 @@ public class ConnectorSink extends Connector {
 
 	@Override
 	public void acceptSignalFrom(Connectable source, IntVector2 pos, GameContext ctx, HashSet<Integer> seen) {
-    if (source.getConnectorType() != this.type)
-      return;
-    this.connected = source.isConnected();
+    if (source.getConnectorType() != this.type) return;
+    if (seen.contains(owner.getID())) return;
+
+    seen.add(owner.getID());
+
+    boolean incomingSignal = source.isConnected();
+    if (incomingSignal != this.connected){
+      this.connected = incomingSignal;
+
+      ctx.map.getEventBus().post(
+        new GameEvent.Builder(connected ? EventType.ItemConnected : EventType.ItemDisconnected , ctx)
+        .source(owner)
+        .build()
+      );
+    }
     updateColor();
 	}
 

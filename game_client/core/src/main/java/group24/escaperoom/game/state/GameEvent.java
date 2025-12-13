@@ -7,8 +7,10 @@ import group24.escaperoom.game.entities.Item;
 public class GameEvent {
 
   public enum EventType {
-    ItemObtained,
-    ItemStateChange;
+    ItemObtained,      // Item obtained by player
+    ItemStateChange,   // General state change
+    ItemConnected,     // Connectable item became connected
+    ItemDisconnected,  // Connectable item became disconnected
   }
 
   public final GameContext ctx;

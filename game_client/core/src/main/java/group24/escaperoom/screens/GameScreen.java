@@ -45,8 +45,10 @@ import group24.escaperoom.game.ui.ActionLog;
 import group24.escaperoom.game.ui.GameSettingsDialog;
 import group24.escaperoom.game.ui.PlayerInventoryItemSlot.PlayerInventorySource;
 import group24.escaperoom.game.world.FowTile;
+import group24.escaperoom.game.world.Grid;
 import group24.escaperoom.services.GameStatistics;
 import group24.escaperoom.ui.dnd.ItemPayload;
+import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.ui.widgets.G24Dialog;
 
 /**
@@ -77,10 +79,16 @@ public abstract class GameScreen extends MapScreen {
   FowTile[][] fowTiles;
   protected Table rootTable;
   public GameStatistics stats = new GameStatistics();
+  private GameEventBus bus = new GameEventBus();
   private long startTime;
+  protected Array<Item> pollItems = new Array<>();
 
   public ActionLog getActionLog() {
     return actionlog;
+  }
+
+  public GameEventBus getEventBus() {
+    return bus;
   }
 
   public GameType getGameType() {
@@ -143,7 +151,7 @@ public abstract class GameScreen extends MapScreen {
     rootTable.defaults().pad(10);
     getUIStage().addActor(rootTable);
 
-    actionlog = new ActionLog();
+    actionlog = new ActionLog(this);
     rootTable.add(actionlog).left().bottom().size(300, 150);
     actionlog.emit("Game Started...");
 
@@ -164,6 +172,33 @@ public abstract class GameScreen extends MapScreen {
     stats.timeMilliseconds = finishTime - startTime;
     stats.completedSucessfully = completedSucessfully;
     player.calculateStatistics(stats);
+  }
+
+  /**
+   * Registers an Item for polling if it needs it.
+   *
+   * If called with an Item that doesn't need polling, this function does nothing.
+   */
+  public void maybeAddPolling(Item item) {
+    if (item.hasProperty(PropertyType.ConditionallyVisible)) {
+      pollItems.add(item);
+      return;
+    }
+
+    item.getProperty(PropertyType.ConditionallyActive, ConditionallyActive.class)
+      .ifPresent((ConditionallyActive ca) -> {
+        if (ca.requiresPoll()) pollItems.add(item);
+      }
+    );
+  }
+
+  @Override
+  public void loadGrid(Grid grid) {
+    super.loadGrid(grid);
+    for (Item item : grid.items.values()){
+      maybeAddPolling(item);
+      item.getProperties().forEach((p) -> p.onGameLoad(this));
+    }
   }
 
   private Optional<Item> priorityItemAt(int x, int y){

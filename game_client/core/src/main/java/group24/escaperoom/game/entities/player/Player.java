@@ -24,7 +24,6 @@ import group24.escaperoom.engine.render.Drawable;
 import group24.escaperoom.game.entities.properties.InteractableProperty;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.state.GameContext;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.state.GameEvent.EventType;
 import group24.escaperoom.game.ui.PlayerInventoryDialog;
 import group24.escaperoom.game.entities.Item;
@@ -78,6 +77,10 @@ public class Player extends Actor implements Drawable {
   private boolean inventoryOpen = false;
   private Optional<PlayerInventoryDialog> dialog = Optional.empty();
 
+  public PlayerDetails getDetails(){
+    return details;
+  }
+
   public void setDetails(PlayerDetails details) {
     this.details = details;
   }
@@ -119,7 +122,7 @@ public class Player extends Actor implements Drawable {
 
     gameScreen = game;
 
-    GameEventBus.get().addListener(
+    game.getEventBus().addListener(
       (ev) -> addItemToInventory(ev.source), 
       (ev) -> ev.type == EventType.ItemObtained
     );
@@ -402,7 +405,7 @@ public class Player extends Actor implements Drawable {
       details.hitboxInfo.height
     );
 
-    for (Item item : getGameScreen().itemsNear(new Circle(newX, newY, 3))) {
+    for (Item item : getGameScreen().itemsNear(new Circle(newX, newY, details.speed))) {
       Optional<Rectangle> blockRegion = item.blockingRegion();
       if (blockRegion.isPresent()) {
         if (blockRegion.get().overlaps(newPostition)) {

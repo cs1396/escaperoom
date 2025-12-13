@@ -5,11 +5,15 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class GameEventBus {
-  private static final GameEventBus inst = new GameEventBus();
-  private final HashMap<GameEventListener, GameEventFilter> listeners  = new HashMap<>();
-  private final HashSet<GameEventListener> toRemove = new HashSet<>();
+  private HashMap<GameEventListener, GameEventFilter> listeners  = new HashMap<>();
+  private HashSet<GameEventListener> toRemove = new HashSet<>();
 
-  public static GameEventBus get() { return inst; }
+  /**
+   * Clear all listeners from the event bus
+   */
+  public void reset(){
+    listeners.clear();
+  }
 
   public void addListener(GameEventListener listener){
     listeners.put(listener, null);

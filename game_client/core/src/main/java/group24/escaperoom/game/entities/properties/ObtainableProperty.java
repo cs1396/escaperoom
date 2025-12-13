@@ -10,7 +10,6 @@ import group24.escaperoom.game.entities.properties.base.PhantomProperty;
 import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.state.GameEvent.EventType;
 
 public class ObtainableProperty extends PhantomProperty {
@@ -37,7 +36,7 @@ public class ObtainableProperty extends PhantomProperty {
       owner.remove(false);
 
       GameEvent ev = new GameEvent.Builder(EventType.ItemObtained, ctx).source(owner).message("Added " +owner.getItemName() + " to inventory!" ).build();
-      GameEventBus.get().post(ev);
+      ctx.map.getEventBus().post(ev);
 
       return new ActionResult().setCompletesInteraction(true);
     }
