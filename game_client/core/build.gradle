@@ -10,4 +10,9 @@ dependencies {
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+
+  // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+  implementation("org.apache.httpcomponents:httpclient:4.3.4")
+  // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime
+  implementation("org.apache.httpcomponents:httpmime:4.5.14")
 }

@@ -2,7 +2,7 @@ package cs1396.escaperoom.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import cs1396.escaperoom.EscapeRoom;
+import cs1396.escaperoom.EscapeRoomGame;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -12,12 +12,13 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new EscapeRoom(), getDefaultConfiguration());
+        AtlasBuilder.buildAtlas();
+        return new Lwjgl3Application(new EscapeRoomGame(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("Escape Room");
+        configuration.setTitle("EscapeRoom");
         //// Vsync limits the frames per second to what your hardware can display, and helps eliminate
         //// screen tearing. This setting doesn't always work on Linux, so the line after is a safeguard.
         configuration.useVsync(true);
@@ -28,18 +29,10 @@ public class Lwjgl3Launcher {
         //// useful for testing performance, but can also be very stressful to some hardware.
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 
-        configuration.setWindowedMode(640, 480);
+        configuration.setWindowedMode(800, 800);
         //// You can change these files; they are in lwjgl3/src/main/resources/ .
         //// They can also be loaded from the root of assets/ .
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
-
-        //// This should improve compatibility with Windows machines with buggy OpenGL drivers, Macs
-        //// with Apple Silicon that have to emulate compatibility with OpenGL anyway, and more.
-        //// This uses the dependency `com.badlogicgames.gdx:gdx-lwjgl3-angle` to function.
-        //// You can choose to remove the following line and the mentioned dependency if you want; they
-        //// are not intended for games that use GL30 (which is compatibility with OpenGL ES 3.0).
-        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0);
-
         return configuration;
     }
 }
