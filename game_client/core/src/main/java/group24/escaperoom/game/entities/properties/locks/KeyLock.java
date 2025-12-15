@@ -12,7 +12,6 @@ import group24.escaperoom.editor.ui.Menu;
 import group24.escaperoom.editor.ui.Menu.MenuEntry;
 import group24.escaperoom.editor.ui.Menu.MenuEntryBuilder;
 import group24.escaperoom.game.entities.Item;
-import group24.escaperoom.game.entities.player.PlayerAction;
 import group24.escaperoom.game.entities.properties.FragileProperty;
 import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.UnlockerProperty;
@@ -20,7 +19,6 @@ import group24.escaperoom.game.entities.properties.base.LockingMethod;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.state.GameEvent;
 import group24.escaperoom.game.state.GameEvent.EventType;
-import group24.escaperoom.game.state.GameEventBus;
 import group24.escaperoom.game.world.Grid;
 import group24.escaperoom.screens.LevelEditor;
 import group24.escaperoom.ui.ItemSelectUI;
@@ -46,7 +44,7 @@ public class KeyLock extends LockingMethod {
     item.getProperty(PropertyType.Fragile, FragileProperty.class).ifPresent((fp) -> {
       if (fp.isTrue()){
         ctx.player.removeItemFromInventory(item);
-        GameEventBus.get().post(
+        ctx.map.getEventBus().post(
           new GameEvent.Builder(EventType.ItemStateChange, ctx)
             .message(item.getItemName() + " was fragile and broke!")
             .build()
@@ -66,7 +64,7 @@ public class KeyLock extends LockingMethod {
     if (maybeKey.isEmpty()){
       String msg = "Hm, " + owner.get().getItemName() +
                    " is still " + (this.isLocked ? "locked": "unlocked");
-      GameEventBus.get().post(
+      ctx.map.getEventBus().post(
         new GameEvent.Builder(EventType.ItemStateChange, ctx)
           .message(msg)
           .build()
@@ -78,54 +76,19 @@ public class KeyLock extends LockingMethod {
     return maybeKey;
   }
 
-  private void updateLocked(GameContext ctx, boolean locked){
-      // We are locked, update state
-      isLocked = locked;
-      if (isBarrier) {
-        owner.get().setBlocksPlayer(locked);
-        owner.get().setAlpha(locked ? 1.0f: 0.5f);
-      }
-
-      GameEventBus.get().post(
-        new GameEvent.Builder(EventType.ItemStateChange, ctx)
-          .message(owner.get().getItemName() + " is now " + (locked ? "locked!": "unlocked!"))
-          .build()
-      );
-  }
-
-  protected class TryLock implements PlayerAction {
-    @Override
-    public String getActionName() {
-      return "Try to lock";
-    }
-
+  protected class LockAction extends AbstractLockAction {
     @Override
     public ActionResult act(GameContext ctx) {
       trySetLock(ctx, true).ifPresent((key) -> checkFragile(ctx, key));
       return ActionResult.DEFAULT;
     }
-
-    @Override
-    public boolean isValid(GameContext ctx) {
-      return !isLocked;
-    }
   };
 
-  protected class TryUnlock implements PlayerAction {
-    @Override
-    public String getActionName() {
-      return "Try to unlock";
-    }
-
+  protected class UnlockAction extends AbstractUnlockAction {
     @Override
     public ActionResult act(GameContext ctx) {
       trySetLock(ctx, false).ifPresent((key) -> checkFragile(ctx, key));
       return ActionResult.DEFAULT;
-    }
-
-    @Override
-    public boolean isValid(GameContext ctx) {
-      return isLocked;
     }
   };
 
@@ -163,11 +126,6 @@ public class KeyLock extends LockingMethod {
 
 
   @Override
-  public Array<PlayerAction> getActions() {
-    return Array.with(new TryUnlock(), new TryLock());
-  }
-
-  @Override
   protected LockingMethod getEmptyMethod() {
     return new KeyLock();
   }
@@ -201,12 +159,12 @@ public class KeyLock extends LockingMethod {
   }
 
   @Override
-  protected PlayerAction maybeGetLockAction() {
-    return new TryLock();
+  protected AbstractLockAction getLockAction() {
+    return new LockAction();
   }
 
   @Override
-  protected PlayerAction maybeGetUnlockAction() {
-    return new TryUnlock();
+  protected AbstractUnlockAction getUnlockAction() {
+    return new UnlockAction();
   }
 }

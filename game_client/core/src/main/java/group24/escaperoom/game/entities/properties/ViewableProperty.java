@@ -21,7 +21,6 @@ import group24.escaperoom.game.entities.properties.base.PropertyDescription;
 import group24.escaperoom.game.entities.properties.values.ImageValue;
 import group24.escaperoom.game.state.GameContext;
 import group24.escaperoom.game.ui.GameDialog;
-import group24.escaperoom.ui.widgets.G24Dialog.Content;
 
 public class ViewableProperty extends ItemProperty<ImageValue> {
 

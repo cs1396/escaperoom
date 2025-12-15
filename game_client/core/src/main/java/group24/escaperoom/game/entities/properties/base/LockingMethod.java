@@ -3,6 +3,8 @@ package group24.escaperoom.game.entities.properties.base;
 import java.util.Optional;
 import java.util.function.Function;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
@@ -18,6 +20,9 @@ import group24.escaperoom.game.entities.properties.PropertyType;
 import group24.escaperoom.game.entities.properties.locks.LockingMethodType;
 import group24.escaperoom.game.entities.properties.values.ItemPropertyValue;
 import group24.escaperoom.game.state.GameContext;
+import group24.escaperoom.game.state.GameEvent;
+import group24.escaperoom.game.state.GameEvent.EventType;
+import group24.escaperoom.screens.GameScreen;
 
 abstract public class LockingMethod implements Json.Serializable, ItemPropertyValue {
   protected boolean isBarrier = false;
@@ -31,17 +36,88 @@ abstract public class LockingMethod implements Json.Serializable, ItemPropertyVa
     return isLocked;
   }
 
-  abstract public Array<PlayerAction> getActions();
+  public Array<PlayerAction> getActions(){
+    Array<PlayerAction> actions = new Array<>();
 
-  /**
-   * Get a player action that would unlock this locking method
-   *
-   * This can be null if the action is not valid, or if there is no such
-   * action for this lock
-   */
-  public @Null PlayerAction getUnlockAction(GameContext ctx){
-    return getAction(ctx, (Void) -> maybeGetUnlockAction());
+    PlayerAction la = getLockAction();
+    PlayerAction ua = getUnlockAction();
+
+    if (la != null) actions.add(la);
+    if (ua != null) actions.add(ua);
+
+    return actions;
   }
+
+  protected void updateLocked(GameContext ctx, boolean locked){
+    updateLocked(
+      ctx,
+      locked,
+      owner.get().getItemName() + " is now locked!",
+      owner.get().getItemName() + " is now unlocked!"
+    );
+  }
+
+  protected void updateLocked(GameContext ctx, boolean locked, String lockMsg, String unlockMsg){
+      // We are locked, update state
+      isLocked = locked;
+      if (isBarrier) {
+        owner.get().setBlocksPlayer(locked);
+        owner.get().setAlpha(locked ? 1.0f: 0.5f);
+      }
+
+      ctx.map.getEventBus().post(
+        new GameEvent.Builder(EventType.ItemStateChange, ctx)
+          .message(locked ? lockMsg : unlockMsg)
+          .build()
+      );
+  }
+
+  protected abstract class AbstractLockAction implements PlayerAction {
+    @Override
+    public String getActionName() {
+      return "Lock";
+    }
+
+    @Override
+    public boolean isValid(GameContext ctx) {
+      if (isBarrier){
+
+        // Without this small adjustment, the distance you have
+        // to be from the item is frustrating.
+        // This allows just enough overlap that the interaction is more 
+        // natural while still preventing the player from being stuck
+        Rectangle occupied = owner.get().getOccupiedRegion();
+        Vector2 occupiedCenter = new Vector2();
+        occupied.getCenter(occupiedCenter);
+        Rectangle invalidZone = new Rectangle();
+
+        invalidZone.setSize(
+          occupied.width - 0.1f,
+          occupied.height - 0.1f
+        );
+
+        invalidZone.setCenter(occupiedCenter);
+
+        return !isLocked && !ctx.player.getOccupiedRegion().overlaps(invalidZone);
+      } else {
+        return !isLocked;
+      }
+    }
+  }
+
+  protected abstract class AbstractUnlockAction implements PlayerAction {
+
+    @Override
+    public String getActionName() {
+      return "Unlock";
+    }
+
+    @Override
+    public boolean isValid(GameContext ctx) {
+      return isLocked;
+    }
+  }
+
 
   private @Null PlayerAction getAction(GameContext ctx, Function<Void, PlayerAction> func){
     if (owner.isEmpty()) return null;
@@ -57,15 +133,23 @@ abstract public class LockingMethod implements Json.Serializable, ItemPropertyVa
   /**
    * Get a player action that would lock this locking method
    *
-   * This can be null if the action is not valid, or if there is no such
-   * action for this lock
+   * This can be null if the action is not valid
    */
   public @Null PlayerAction getLockAction(GameContext ctx){
-    return getAction(ctx, (Void) -> maybeGetUnlockAction());
+    return getAction(ctx, (Void) -> getLockAction());
   }
 
-  abstract protected @Null PlayerAction maybeGetLockAction();
-  abstract protected @Null PlayerAction maybeGetUnlockAction();
+  /**
+   * Get a player action that would unlock this locking method
+   *
+   * This can be null if the action is not valid
+   */
+  public @Null PlayerAction getUnlockAction(GameContext ctx){
+    return getAction(ctx, (Void) -> getUnlockAction());
+  }
+
+  abstract protected AbstractLockAction getLockAction();
+  abstract protected AbstractUnlockAction getUnlockAction();
 
   abstract public LockingMethodType getType();
 
@@ -113,4 +197,7 @@ abstract public class LockingMethod implements Json.Serializable, ItemPropertyVa
     p.read(new Json(), new JsonReader().parse(new Json().toJson(this)));
     return p;
   }
+
+  public void onGameLoad(GameScreen screen){ }
+
 }
