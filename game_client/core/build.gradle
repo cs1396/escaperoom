@@ -2,16 +2,12 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-  api "com.github.lyze237:gdx-FlexBox:818ccf2764"
+  api "com.github.tommyettinger:libgdx-texturepacker:$texturePackerOnlyVersion"
+  api "com.github.tommyettinger:libgdx-textureunpacker:$textureUnpackerOnlyVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
-
-  // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-  implementation("org.apache.httpcomponents:httpclient:4.3.4")
-  // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime
-  implementation("org.apache.httpcomponents:httpmime:4.5.14")
 }
