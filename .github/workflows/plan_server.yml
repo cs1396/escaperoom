@@ -1,9 +1,3 @@
-# This workflow installs the latest version of Terraform CLI
-# On pull request events, this workflow will run `terraform init`, `terraform fmt`, and `terraform plan`.
-# On push events to the "main" branch, `terraform apply` will be executed.
-#
-# Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
-
 name: 'Plan Server'
 
 on:
