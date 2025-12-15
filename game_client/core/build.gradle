@@ -2,9 +2,10 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
+  api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-  api "com.github.lyze237:gdx-FlexBox:818ccf2764"
+  api "com.github.tommyettinger:libgdx-texturepacker:$texturePackerOnlyVersion"
+  api "com.github.tommyettinger:libgdx-textureunpacker:$textureUnpackerOnlyVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
