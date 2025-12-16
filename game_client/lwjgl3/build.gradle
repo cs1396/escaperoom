@@ -163,21 +163,34 @@ construo {
 }
 
 // run all package tasks
-tasks.register('downloadJdks') {
+tasks.register('LinuxArmJdk') {
   dependsOn 'downloadJdkLinuxArm'
-  dependsOn 'downloadJdkLinuxX64'
-  dependsOn 'downloadJdkMacArm'
-  dependsOn 'downloadJdkMacX64'
-  dependsOn 'downloadJdkWinX64'
-}
-tasks.register('unpackJdks') {
   dependsOn 'unzipJdkLinuxArm'
+}
+tasks.register('LinuxX64Jdk') {
+  dependsOn 'downloadJdkLinuxX64'
   dependsOn 'unzipJdkLinuxX64'
+}
+tasks.register('MacArmJdk') {
+  dependsOn 'downloadJdkMacArm'
   dependsOn 'unzipJdkMacArm'
+}
+tasks.register('MacX64Jdk') {
+  dependsOn 'downloadJdkMacX64'
   dependsOn 'unzipJdkMacX64'
+}
+tasks.register('WinX64Jdk') {
+  dependsOn 'downloadJdkWinX64'
   dependsOn 'unzipJdkWinX64'
 }
-tasks.register('fullBuild') {
+tasks.register('LoadJDKs') {
+  dependsOn 'LinuxArmJdk'
+  dependsOn 'LinuxX64Jdk'
+  dependsOn 'MacArmJdk'
+  dependsOn 'MacX64Jdk'
+  dependsOn 'WinX64Jdk'
+}
+tasks.register('FullBuild') {
   dependsOn 'packageLinuxArm'
   dependsOn 'packageLinuxX64'
   dependsOn 'packageMacArm'
