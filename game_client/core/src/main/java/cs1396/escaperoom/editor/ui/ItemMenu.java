@@ -42,9 +42,10 @@ public class ItemMenu extends Menu {
     add(new MenuEntryBuilder(this,"Edit Item Instance")
       .onClick(() -> {
         target.setSelected(false);
-        if (MapSaver.saveMap(editor.grid, editor.getMetadata())){
-          ScreenManager.instance().showScreen(new ItemEditor(
-            new MapData(editor.grid, editor.getMetadata()),  target), true
+        if (MapSaver.saveMap(editor.getMapData())){
+          ScreenManager.instance().showScreen(
+            new ItemEditor(editor.getMapData(), target),
+            true
           );
         } else {
           Notifier.error("Failed to save map");

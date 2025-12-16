@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Scaling;
 
 import cs1396.escaperoom.engine.BackManager;
 import cs1396.escaperoom.engine.assets.AssetManager;
+import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.assets.maps.MapLoader;
 import cs1396.escaperoom.engine.assets.maps.MapManager;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata;
@@ -517,9 +518,11 @@ public class MapSelectScreen extends MenuScreen {
             }
 
             MapMetadata newMetadata = new MapMetadata(newMap, false);
-        
-            if (!MapSaver.saveMap(new Grid(s.width, s.width),
-                newMetadata)) {
+            MapData newMapData = new MapData(newMetadata);
+            newMapData.registerGrid(MapData.DEFAULT_GRID_NAME, new Grid(s.width, s.height));
+            newMapData.registerStart(MapData.DEFAULT_GRID_NAME);
+
+            if (!MapSaver.saveMap(newMapData)) {
               Notifier.warn("Error creating map \"" + newMap + "\"");
               return true;
             }

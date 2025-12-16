@@ -62,45 +62,187 @@ public class MapLoader {
 
   }
 
-  public static Optional<MapData> tryLoadMap(MapMetadata data, boolean create){
+  /**
+   * Load a legacy map that defines {@code MAPDIR/content/mapdata.json} 
+   * by transitioning that data into the new file struture
+   */
+  private static Optional<MapData> tryLoadLegacyMap(MapMetadata metadata){
+
+    log.info("Legacy Map file detected, transitioning to new structure");
+    // Transition from old file structure to new one
+    if(!FileUtils.tryCreateFolder(new File(metadata.locations.mapGridPath))){
+      return Optional.empty();
+    }
+
+    File legacyMapFile = new File(metadata.locations.mapMainFilePath);
+    File newMapFile = new File(
+      metadata.locations.mapGridPath + MapManager.gridFileName(MapData.DEFAULT_GRID_NAME)
+    );
+
+    log.info(
+      String.format("Copying %s to %s", legacyMapFile.getAbsolutePath(), newMapFile.getAbsolutePath())
+    );
+    FileUtils.copy(legacyMapFile.toPath(), newMapFile.toPath());
+
+    if (!newMapFile.exists()){
+      log.info(
+        String.format("Error Copying %s to %s",
+          legacyMapFile.getAbsolutePath(),
+          newMapFile.getAbsolutePath()
+        )
+      );
+      return Optional.empty();
+    }
+
+    log.info(
+      String.format("Removing old map data at %s", legacyMapFile.getAbsolutePath())
+    );
+    if (!legacyMapFile.delete()){
+      log.warning(
+        String.format("Error removing old map data at", legacyMapFile.getAbsolutePath())
+      );
+      return Optional.empty();
+    }
+
+    log.info("Updating and saving new metadata");
+    metadata.startingGrid = MapData.DEFAULT_GRID_NAME;
+
+    if (!MapSaver.updateMetadata(metadata)){
+      log.warning("Failed to save new metadata");
+      return Optional.empty();
+    }
+
+    return tryLoadMulitGridMap(metadata, false);
+  }
+
+  /**
+   * Load a multigrid map
+   *
+   * @param metadata for the map 
+   * @param create whether to create the map if it doesn't exist
+   */
+  private static Optional<MapData> tryLoadMulitGridMap(MapMetadata metadata, boolean create){
+
+    File gridFolder = new File(metadata.locations.mapGridPath);
+
+    boolean gridFolderExists = gridFolder.exists();
+    boolean gridFolderEmpty = true;
+    File[] gridFiles = null;
+
+    if (gridFolderExists) {
+      gridFiles = gridFolder.listFiles();
+      gridFolderEmpty = gridFiles == null ? true : gridFiles.length == 0;
+    }
+
+    boolean gridFolderValid = gridFolderExists && !gridFolderEmpty;
+
+    // If the folder doesn't exist and we aren't creating -> invalid
+    if (!gridFolderValid && !create){
+      log.warning("Cannot load map with no defined grids: " + gridFolder.getAbsolutePath());
+      return Optional.empty();
+    }
+
+    MapData mapData = new MapData(metadata);
+
+    if (!gridFolderValid && create){
+      log.info("Grid folder was invalid, and create set -> creating new map" );
+      Grid grid = new Grid(AbstractScreen.WORLD_WIDTH, AbstractScreen.WORLD_HEIGHT);
+      mapData.registerGrid(MapData.DEFAULT_GRID_NAME, grid);
+      mapData.registerStart(MapData.DEFAULT_GRID_NAME);
+
+      if (!MapSaver.saveMap(mapData)){
+        log.warning(String.format("Failed to save new map %s", metadata.name));
+        return Optional.empty();
+      }
+      return Optional.of(mapData);
+    }
+    
+    boolean foundStart = false;
+    for (File maybeGrid : gridFiles){
+      Optional<String> maybeGridName = MapManager.gridNameFromFileName(maybeGrid.getName());
+      if (maybeGridName.isPresent()){
+        String gridName = maybeGridName.get();
+
+        mapData.registerGrid(gridName);
+
+        if (gridName.equals(metadata.startingGrid)){
+          foundStart = true;
+          mapData.registerStart(gridName);
+        } 
+
+      }
+    }
+
+    if (!foundStart){
+      log.severe(
+        String.format("Did not find starting grid \"%s\" in %s",
+          metadata.startingGrid,
+          gridFolder.getAbsolutePath()
+        )
+      );
+    }
+
+    return Optional.of(mapData);
+  }
+
+  /**
+   * Try to load a map.
+   *
+   * @param metadata for the map 
+   * @param create whether to create the map if it doesn't exist
+   *
+   * @return {@code Optional.empty()} on failure, {@code Optional.of(MapData)} on success
+   */
+  public static Optional<MapData> tryLoadMap(MapMetadata metadata, boolean create){
     LoadedObjects.clearUserItems();
     AssetManager.instance().invalidateTextureCache();
 
-    if (!tryLoadTextures(data)) return Optional.empty();
+    if (!tryLoadTextures(metadata)) return Optional.empty();
 
-    if (!tryLoadObjects(data)) return Optional.empty();
+    if (!tryLoadObjects(metadata)) return Optional.empty();
 
-    File mapDataPath = new File(data.locations.mapContentPath);
-    if (!mapDataPath.exists()){
-      if (create){
-        Grid newGrid = new Grid(AbstractScreen.WORLD_WIDTH, AbstractScreen.WORLD_HEIGHT);
-        if (!MapSaver.saveMap(newGrid, data)){
-          log.warning(String.format("Failed to save new map %s", data.name));
-        }
-        return Optional.of(new MapData(newGrid, data));
+    File legacyMapPath = new File(metadata.locations.mapMainFilePath);
+    if (legacyMapPath.exists()){
+      return tryLoadLegacyMap(metadata);
+    } else {
+      return tryLoadMulitGridMap(metadata, create);
+    }
+  }
 
-      } else {
-        log.warning(String.format("Cannot load map %s, file does not exist", mapDataPath.getAbsolutePath()));
-        return Optional.empty();
-      }
+  /**
+   * Pacakge private function to load a grid
+   *
+   * @param gridName name of the grid
+   * @param metadata metadata of the map
+   */
+  static Optional<Grid> loadGrid(String gridName, MapMetadata metadata){
+    return loadGrid(new File(metadata.locations.mapGridPath + MapManager.gridFileName(gridName)));
+  }
 
+  private static Optional<Grid> loadGrid(File gridPath){
+    log.info("Loading grid from file: " + gridPath.getAbsolutePath());
+
+    if (!gridPath.exists()){ 
+      log.info("Grid file (" + gridPath.getAbsolutePath() + ") did not exist");
+      return Optional.empty();
     }
 
     Grid grid = new Grid();
-    File mainFile = new File(data.locations.mapMainFilePath);
     try {
-      String jsonStr = Files.readString(mainFile.toPath());
+      String jsonStr = Files.readString(gridPath.toPath());
       JsonReader reader = new JsonReader();
 
       grid.read(new Json(), reader.parse(jsonStr));
     } catch (Exception e) {
-      log.severe(String.format("Error loading map json"));
+      log.severe(String.format("Error loading grid json"));
       e.printStackTrace();
 
       return Optional.empty();
     }
 
-    return Optional.of(new MapData(grid, data));
+    log.info("Load sucessful (" + gridPath.getAbsolutePath() + ")");
+    return Optional.of(grid);
+
   }
 
   public static Optional<MapData> loadMap(MapLocation id) {
@@ -198,11 +340,16 @@ public class MapLoader {
     File mapData = null;
     boolean definesObjects = false;
     boolean definesTextures = false;
+    boolean definesGrids = false;
 
     for (File f : mapContentDir.listFiles()) {
       if (f.getName().equals("mapdata.json")) {
         log.info("-> Found mapdata.json");
         mapData = f;
+      }
+      if (f.getName().equals("grids")){
+        log.info("-> Found mapdata.json");
+        definesGrids = true;
       }
       if (f.getName().equals("textures")) {
         log.info("-> Found a texture directory");
@@ -214,8 +361,8 @@ public class MapLoader {
       }
     }
 
-    if (mapData == null) {
-      log.warning(String.format("Map directory (%s) does not contain map json", mapContentDir.getAbsolutePath()));
+    if (mapData == null && !definesGrids) {
+      log.warning(String.format("Map directory (%s) does not contain map json or a grid directory", mapContentDir.getAbsolutePath()));
       return Optional.empty();
     }
 
@@ -246,7 +393,6 @@ public class MapLoader {
     }
 
     metadata.locations = locations;
-    // metadata.name = locations.name;
 
     return Optional.of(metadata);
   }

@@ -13,30 +13,41 @@ import cs1396.escaperoom.game.world.Grid;
 public class MapSaver {
   private static Logger log = Logger.getLogger(MapSaver.class.getName());
 
-  private static boolean tryCreatePath(File file){
-    if (!file.exists()){
-      boolean created = true;
-      try {
-        // create the file
-        created = file.createNewFile();
-      } catch (Exception e) {
-        log.warning("Unable to create file " + file.getAbsolutePath());
-        e.printStackTrace();
-        created = false;
-      }
-      // if it didnt error but didnt create exit here.
-      if (!created) {
-        return false;
-      }
-    }
-    return true;
-  }
-
+  /**
+   * Reinspect the map file structure to update the metadata
+   * to reflect user defined objects and textures.
+   * 
+   * Saves the metadata to disk after update
+   */
   public static boolean updateMetadata(MapMetadata metadata){
     // create the map folder if it doesn't exist
-    File mapDir = new File(metadata.locations.mapBasePath);
-    if (!FileUtils.tryCreateFolder(mapDir)){
+    File mapContentDir = new File(metadata.locations.mapContentPath);
+    if (!mapContentDir.exists() || !mapContentDir.isDirectory()) {
+      log.warning(
+          String.format("Failed to load map content directory %s, directory does not exist", mapContentDir.getAbsolutePath()));
       return false;
+    }
+
+    boolean definesObjects = false;
+    boolean definesTextures = false;
+
+    for (File f : mapContentDir.listFiles()) {
+      if (f.getName().equals("textures")) {
+        log.info("-> Found a texture directory");
+        definesTextures = true;
+      }
+      if (f.getName().equals("objects")) {
+        log.info("-> Found an object directory");
+        definesObjects = true;
+      }
+    }
+
+    if (definesTextures) {
+      metadata.setTextureDir(metadata.locations.mapContentPath + "/textures");
+    }
+
+    if (definesObjects) {
+      metadata.setObjectDir(metadata.locations.mapContentPath + "/objects");
     }
 
     return saveMetadata(metadata);
@@ -49,9 +60,11 @@ public class MapSaver {
 
   private static boolean saveMetadata(MapMetadata data) {
     // write the metadata to the map folder
-    try {
-      File metaDataFile = new File(data.locations.mapMetadataPath);
-      FileOutputStream fout = new FileOutputStream(metaDataFile);
+    File metaDataFile = new File(data.locations.mapMetadataPath);
+
+    log.info("Writing metadata to " + metaDataFile.getAbsolutePath());
+
+    try (FileOutputStream fout = new FileOutputStream(metaDataFile)) {
       Json j = new Json();
       j.setOutputType(JsonWriter.OutputType.json);
       fout.write(j.toJson(data).getBytes());
@@ -66,46 +79,47 @@ public class MapSaver {
   /**
    * Returns {@code true} if saved and {@code false} if unable to be
    */
-  public static boolean saveMap(Grid grid, MapMetadata metadata) {
-    // create the app data directory if it doesn't exist
-    File mapDir = new File(FileUtils.getAppDataDir());
-    if (!FileUtils.tryCreateFolder(mapDir)){
+  public static boolean saveMap(MapData data) {
+    // Create the grid folder (and it's parents) if it doesn't exist
+    //                     1       2     3      4         5      6
+    // ~/.local/share/escaperoom/maps/local/<map_name>/content/grids
+    File dir = new File(data.metadata.locations.mapGridPath);
+    if (!FileUtils.tryCreateFolderPath(dir, 6)){
       return false;
     }
 
-    // create this maps folder if it doesn't exist
-    File dir = new File(metadata.locations.mapBasePath);
-    if (!FileUtils.tryCreateFolder(dir)){
+    // save the metadata
+    if (!saveMetadata(data.metadata)){
       return false;
     }
 
-    // create this maps content folder if it doesn't exist
-    dir = new File(metadata.locations.mapContentPath);
-    if (!FileUtils.tryCreateFolder(dir)){
-      return false;
+
+    for (String gridName : data.getGridNames()){
+      File gridFile = new File(data.metadata.locations.mapGridPath + MapManager.gridFileName(gridName));
+
+      log.info("Saving grid file for grid \"" + gridName + "\" at " + gridFile.getAbsolutePath());
+
+      if (!FileUtils.tryCreatePath(gridFile)){
+        return false;
+      }
+
+      if (!saveGrid(data.getGrid(gridName), gridFile)){
+        return false;
+      }
     }
 
-    File map = new File(metadata.locations.mapMainFilePath);
-    if (!tryCreatePath(map)){
-      return false;
-    }
+    return true;
+  }
 
-    if (!saveMetadata(metadata)){
-      return false;
-    }
-
-    // write the map to the map file
-    try {
-      FileOutputStream fout = new FileOutputStream(map);
+  private static boolean saveGrid(Grid grid, File writeTo){
+    try (FileOutputStream fout = new FileOutputStream(writeTo)){
       Json j = new Json();
       j.setOutputType(JsonWriter.OutputType.json);
       fout.write(j.toJson(grid).getBytes());
-      fout.close();
+      return true;
     } catch (Exception e) {
       e.printStackTrace(); 
       return false;
     }
-
-    return true;
   }
 }

@@ -24,7 +24,7 @@ public class SinglePlayerGame extends GameScreen {
 
   public SinglePlayerGame(MapData data, boolean verifying){
     super(data);
-    applyGrid(data.getGrid());
+    applyGrid(data.getStartGrid());
     this.gameType = verifying? GameType.Verifying : GameType.Standard;
 
     if (verifying){
@@ -37,7 +37,7 @@ public class SinglePlayerGame extends GameScreen {
 
   public SinglePlayerGame(MapData mapdata) {
     super(mapdata);
-    applyGrid(mapdata.getGrid());
+    applyGrid(mapdata.getStartGrid());
     this.gameType = GameType.Editor;
   }
 
@@ -77,7 +77,7 @@ public class SinglePlayerGame extends GameScreen {
     editButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (editButton.isChecked()) {
-          MapLoader.tryLoadMap(metadata).ifPresent((g) -> {
+          MapLoader.tryLoadMap(mapData.getMetadata()).ifPresent((g) -> {
             ScreenManager.instance().showScreen(new LevelEditor(g));
           });
         }
@@ -98,6 +98,6 @@ public class SinglePlayerGame extends GameScreen {
 
   public void completeLevel(boolean success) {
     calculateStatistics(success);
-    ScreenManager.instance().showScreen(new GameSummary(stats, metadata, gameType));
+    ScreenManager.instance().showScreen(new GameSummary(stats, mapData.getMetadata(), gameType));
   }
 }

@@ -25,7 +25,7 @@ public class Marketplace extends MapSelectScreen {
           entriesUI.clear();
           entries.clear();
           for (MapMetadata data : rsp.metadata) {
-            data.locations = new MapLocation(data.mapID, false);
+            data.locations = new MapLocation(data.mapID, true);
             MapEntry e = new MapEntry(data);
             entriesUI.addActor(e);
             entries.add(e);
@@ -54,7 +54,7 @@ public class Marketplace extends MapSelectScreen {
     waitFor(Networking.listMapMetadata((ListMapsRequest)new ListMapsRequest().withLimit(10).withSort(new Sort("name"))),
         (ListMapsResponse rsp) -> {
           rsp.metadata.forEach((meta) -> {
-            meta.locations = new MapLocation(meta.mapID, false);
+            meta.locations = new MapLocation(meta.mapID, true);
           });
           new MapSelectScreenBuilder(new OnlineMainMenu()).download().withMaps(rsp.metadata);
           init(MapSelectScreenBuilder.getMaps(), MapSelectScreenBuilder.getSettings(),
