@@ -125,12 +125,17 @@ construo {
     humanName.set(appName)
 
     targets.configure {
+      register("linuxArm", Target.Linux) {
+        architecture.set(Target.Architecture.AARCH64)
+        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_linux_hotspot_17.0.15_6.tar.gz")
+        // Linux does not currently have a way to set the icon on the executable
+      }
       register("linuxX64", Target.Linux) {
         architecture.set(Target.Architecture.X86_64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
       }
-      register("macM1", Target.MacOs) {
+      register("macArm", Target.MacOs) {
         architecture.set(Target.Architecture.AARCH64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
@@ -155,6 +160,29 @@ construo {
         //useConsole.set(true)
       }
     }
+}
+
+// run all package tasks
+tasks.register('downloadJdks') {
+  dependsOn 'downloadJdkLinuxArm'
+  dependsOn 'downloadJdkLinuxX64'
+  dependsOn 'downloadJdkMacArm'
+  dependsOn 'downloadJdkMacX64'
+  dependsOn 'downloadJdkWinX64'
+}
+tasks.register('unpackJdks') {
+  dependsOn 'unzipJdkLinuxArm'
+  dependsOn 'unzipJdkLinuxX64'
+  dependsOn 'unzipJdkMacArm'
+  dependsOn 'unzipJdkMacX64'
+  dependsOn 'unzipJdkWinX64'
+}
+tasks.register('fullBuild') {
+  dependsOn 'packageLinuxArm'
+  dependsOn 'packageLinuxX64'
+  dependsOn 'packageMacArm'
+  dependsOn 'packageMacX64'
+  dependsOn 'packageWinX64'
 }
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
