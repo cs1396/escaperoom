@@ -1,0 +1,34 @@
+name: 'Build Stable'
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Publish Binaries
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: "game_client"
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Upload to Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        # repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/release/mything
+        asset_name: mything
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+        body: "This is my release text"
