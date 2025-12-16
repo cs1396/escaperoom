@@ -42,6 +42,58 @@ public class FileUtils {
     return directoryToBeDeleted.delete();
   }
 
+  public static boolean tryCreatePath(File file){
+    if (!file.exists()){
+      boolean created = true;
+      try {
+        // create the file
+        created = file.createNewFile();
+      } catch (Exception e) {
+        log.warning("Unable to create file " + file.getAbsolutePath());
+        e.printStackTrace();
+        created = false;
+      }
+      // if it didnt error but didnt create exit here.
+      if (!created) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Recursively create the directory at {@code path} 
+   * and all of it's parents, up to {@code maxStepsUp}
+   *
+   * @param path to create
+   * @param maxStepsUp maximum number of directories to create while recursing up
+   */
+  public static boolean tryCreateFolderPath(File path, int maxStepsUp){
+    return createParent(path, maxStepsUp);
+  }
+
+  private static boolean createParent(File path, int maxSteps){
+    // Base case: all steps have been taken!
+    if (maxSteps <= 0) return true;
+
+    // Base case: parent doesn't exist
+    if (path == null) return false;
+
+    // Base case: path already exists
+    if (path.exists()) return true;
+
+    // Try to create the parent of the folder
+    if (!createParent(path.getParentFile(), maxSteps - 1)){
+      return false;
+    } 
+
+    // Parent sucessfully created, create this folder
+    if (tryCreateFolder(path)) return true;
+
+    // Creation failed
+    return false;
+  }
+
   public static boolean copyDirectory(Path src, Path dest) {
     try (Stream<Path> stream = Files.walk(src)) {
       stream.forEach(source -> copy(source, dest.resolve(src.relativize(source))));

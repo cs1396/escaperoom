@@ -316,7 +316,7 @@ public abstract class GameScreen extends MapScreen {
     }
     super.act(time);
 
-    if (!metadata.gameSettings.persistentReveal){
+    if (!mapData.getMetadata().gameSettings.persistentReveal){
       resetRevealed();
     }
 
