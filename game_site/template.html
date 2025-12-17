@@ -1,29 +1,77 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Escape Room Project</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escape Room Project</title>
+    <link rel="stylesheet" href="style.css" />
 
-<body>
-  <main>
-    <h1>Escape Room</h1>
-    <nav>
-      <a href="##STABLE##" target="_blank">Download Stable</a>
-      <a href="/todo.html" target="_blank">Property Documentation</a>
-      <a href="/todo.html" target="_blank">Release Notes</a>
-      <a href="##NIGHTLY##" target="_blank">Download Nightly</a>
-      <a href="/todo.html" target="_blank">Developer Levels</a>
-      <a href="/todo.html" target="_blank">Report a Bug</a>
-    </nav>
-  </main>
-  <footer>
+    <script>
+
+    function httpGetAsync(theUrl, callback) {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+          callback(xmlHttp.response);
+      }
+      xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+      xmlHttp.send(null);
+    }
+
+    function loadDynamicLinks(version) {
+      const agent = navigator.userAgent;
+      var arch;
+      if (agent.indexOf("aarch64") != -1) {
+        arch = "Aarch64";
+      } else {
+        arch = "X64";
+      }
+
+      var sys;
+      if (agent.indexOf("Win") != -1) {
+        sys = "win";
+      } else if (agent.indexOf("Linux") != -1) {
+        sys = "linux";
+      } else if (agent.indexOf("Mac") != -1) {
+        sys = "mac";
+      } else {
+        return;
+      }
+
+      var dl = "Escaperoom-" + version + "-" + sys + arch + ".zip";
+      document.getElementById("latest").href = "https://github.com/cs1396/escaperoom/releases/latest/" + dl;
+    }
+
+    function onLoad() {
+      httpGetAsync("https://api.github.com/repos/cs1396/escaperoom/releases/latest", (rsp) => {
+        var body = JSON.parse(rsp);
+
+        loadDynamicLinks(body.tag_name);
+      });
+    }
+
+    onLoad();
+
+    </script>
+  </head>
+
+  <body>
+    <main>
+      <h1>Escape Room</h1>
+      <nav>
+        <a id="latest" href="https://github.com/cs1396/escaperoom/releases/latest" target="_blank">Download Stable</a>
+        <a href="/todo.html" target="_blank">Property Documentation</a>
+        <a href="https://github.com/cs1396/escaperoom/releases/latest" target="_blank">Release Notes</a>
+        <a href="##NIGHTLY##" target="_blank">Download Nightly</a>
+        <a href="/todo.html" target="_blank">Developer Levels</a>
+        <a href="https://github.com/cs1396/escaperoom/issues" target="_blank">Report a Bug</a>
+      </nav>
+    </main>
+    <footer>
       Useful links
       <a href="https://github.com/cs1396/escaperoom" target="_blank">Github Repo</a>
       <a href="/todo.html" target="_blank">Javadocs</a>
-  </footer>
-</body>
+    </footer>
+  </body>
 </html>

@@ -125,7 +125,7 @@ construo {
     humanName.set(appName)
 
     targets.configure {
-      register("linuxArm", Target.Linux) {
+      register("linuxAarch64", Target.Linux) {
         architecture.set(Target.Architecture.AARCH64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
@@ -135,7 +135,7 @@ construo {
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
       }
-      register("macArm", Target.MacOs) {
+      register("macAarch64", Target.MacOs) {
         architecture.set(Target.Architecture.AARCH64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
@@ -163,17 +163,17 @@ construo {
 }
 
 // run all package tasks
-tasks.register('LinuxArmJdk') {
-  dependsOn 'downloadJdkLinuxArm'
-  dependsOn 'unzipJdkLinuxArm'
+tasks.register('LinuxAarch64Jdk') {
+  dependsOn 'downloadJdkLinuxAarch64'
+  dependsOn 'unzipJdkLinuxAarch64'
 }
 tasks.register('LinuxX64Jdk') {
   dependsOn 'downloadJdkLinuxX64'
   dependsOn 'unzipJdkLinuxX64'
 }
-tasks.register('MacArmJdk') {
-  dependsOn 'downloadJdkMacArm'
-  dependsOn 'unzipJdkMacArm'
+tasks.register('MacAarch64Jdk') {
+  dependsOn 'downloadJdkMacAarch64'
+  dependsOn 'unzipJdkMacAarch64'
 }
 tasks.register('MacX64Jdk') {
   dependsOn 'downloadJdkMacX64'
@@ -184,16 +184,16 @@ tasks.register('WinX64Jdk') {
   dependsOn 'unzipJdkWinX64'
 }
 tasks.register('LoadJDKs') {
-  dependsOn 'LinuxArmJdk'
+  dependsOn 'LinuxAarch64Jdk'
   dependsOn 'LinuxX64Jdk'
-  dependsOn 'MacArmJdk'
+  dependsOn 'MacAarch64Jdk'
   dependsOn 'MacX64Jdk'
   dependsOn 'WinX64Jdk'
 }
 tasks.register('FullBuild') {
-  dependsOn 'packageLinuxArm'
+  dependsOn 'packageLinuxAarch64'
   dependsOn 'packageLinuxX64'
-  dependsOn 'packageMacArm'
+  dependsOn 'packageMacAarch64'
   dependsOn 'packageMacX64'
   dependsOn 'packageWinX64'
 }

@@ -12,3 +12,4 @@ add_assets:
 		cd ./assets/; zip -r ../$$ARCHIVE ./textures ./objects; \
 	done
 
+.PHONY: dist build clean add_assets

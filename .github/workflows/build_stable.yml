@@ -1,9 +1,7 @@
 name: 'Build Stable'
 
 on:
-  push:
-    tags:
-      - '*'
+  push: [ tags ]
 
 permissions:
   contents: write
