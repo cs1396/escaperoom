@@ -80,11 +80,8 @@ public class MapSaver {
    * Returns {@code true} if saved and {@code false} if unable to be
    */
   public static boolean saveMap(MapData data) {
-    // Create the grid folder (and it's parents) if it doesn't exist
-    //                     1       2     3      4         5      6
-    // ~/.local/share/escaperoom/maps/local/<map_name>/content/grids
     File dir = new File(data.metadata.locations.mapGridPath);
-    if (!FileUtils.tryCreateFolderPath(dir, 6)){
+    if (!dir.mkdirs()){
       return false;
     }
 

@@ -134,7 +134,6 @@ public class MapMetadata implements Json.Serializable {
     gameSettings = new GameSettings();
     if (settingsData != null) gameSettings = json.readValue(GameSettings.class, settingsData);
 
-
     JsonValue gridMetaData = jsonData.get("grids");
 
     // Legacy Metadata

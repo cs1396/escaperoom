@@ -69,7 +69,7 @@ public class MapData {
     if (!stages.containsKey(oldName)){
       throw 
         new IllegalStateException(
-          String.format("Cannot rename grid \"%s\" since it is not registered", oldName)
+          String.format("Cannot rename grid \"%s\" since it does not exist", oldName)
         );
     }
 
@@ -77,7 +77,7 @@ public class MapData {
       throw 
         new IllegalStateException(
           String.format(
-            "Cannot rename grid \"%s\" to \"%s\" since that name already is registered",
+            "Cannot rename grid \"%s\" to \"%s\" since that name already exists",
             oldName,
             newName
           )

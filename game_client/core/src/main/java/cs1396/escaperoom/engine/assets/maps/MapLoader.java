@@ -180,6 +180,7 @@ public class MapLoader {
           gridFolder.getAbsolutePath()
         )
       );
+      return Optional.empty();
     }
 
     return Optional.of(mapData);
@@ -210,7 +211,7 @@ public class MapLoader {
   }
 
   /**
-   * Pacakge private function to load a grid
+   * Package private function to load a grid
    *
    * @param gridName name of the grid
    * @param metadata metadata of the map
@@ -362,7 +363,7 @@ public class MapLoader {
     }
 
     if (mapData == null && !definesGrids) {
-      log.warning(String.format("Map directory (%s) does not contain map json or a grid directory", mapContentDir.getAbsolutePath()));
+      log.warning(String.format("Map directory (%s) does not contain map json nor a grid directory with grid files", mapContentDir.getAbsolutePath()));
       return Optional.empty();
     }
 

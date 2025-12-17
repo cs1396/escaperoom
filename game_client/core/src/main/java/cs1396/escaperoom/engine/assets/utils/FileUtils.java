@@ -14,18 +14,12 @@ public class FileUtils {
 
   public static boolean tryCreateFolder(File dir){
     if (!dir.exists()){
-      boolean created;
       try {
-        // create the file
-        created = dir.mkdir();
+        // create file
+        return dir.mkdir();
       } catch (Exception e) {
         log.warning("Unable to create dir " + dir.getAbsolutePath());
         e.printStackTrace();
-        created = false;
-      }
-
-      // if it didnt error but didnt create exit here.
-      if (!created) {
         return false;
       }
     }
@@ -59,39 +53,6 @@ public class FileUtils {
       }
     }
     return true;
-  }
-
-  /**
-   * Recursively create the directory at {@code path} 
-   * and all of it's parents, up to {@code maxStepsUp}
-   *
-   * @param path to create
-   * @param maxStepsUp maximum number of directories to create while recursing up
-   */
-  public static boolean tryCreateFolderPath(File path, int maxStepsUp){
-    return createParent(path, maxStepsUp);
-  }
-
-  private static boolean createParent(File path, int maxSteps){
-    // Base case: all steps have been taken!
-    if (maxSteps <= 0) return true;
-
-    // Base case: parent doesn't exist
-    if (path == null) return false;
-
-    // Base case: path already exists
-    if (path.exists()) return true;
-
-    // Try to create the parent of the folder
-    if (!createParent(path.getParentFile(), maxSteps - 1)){
-      return false;
-    } 
-
-    // Parent sucessfully created, create this folder
-    if (tryCreateFolder(path)) return true;
-
-    // Creation failed
-    return false;
   }
 
   public static boolean copyDirectory(Path src, Path dest) {
