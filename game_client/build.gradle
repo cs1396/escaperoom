@@ -56,7 +56,7 @@ configure(subprojects) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'Escape Room'
+  ext.appName = 'EscapeRoom'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.

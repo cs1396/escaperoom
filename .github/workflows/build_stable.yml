@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Publish Binaries
@@ -20,15 +23,22 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build
-      run: cargo build --release
+      run: | 
+        make dist
+
+        # rename to correct version
+        for FILE in lwjgl3/build/construo/dist/*; do
+          NAME=$(echo "$FILE" | sed 's/##VERSION##/${{ github.ref }}/');
+          mv $FILE $NAME
+        done
+
+        cd lwjgl3/build/construo/dist; sha256sum * > SHA256Sum.txt
 
     - name: Upload to Release
       uses: svenstaro/upload-release-action@v2
       with:
         # repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/mything
-        asset_name: mything
+        file: lwjgl3/build/construo/dist/*
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
-        body: "This is my release text"

@@ -119,8 +119,8 @@ tasks.register("jarWin") {
 }
 
 construo {
-    // name of the executable
-    name.set(appName)
+    // name of the executable, plus a templating string
+    name.set("${appName}-##VERSION##")
     // human-readable name, used for example in the `.app` name for macOS
     humanName.set(appName)
 
