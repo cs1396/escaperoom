@@ -14,18 +14,12 @@ public class FileUtils {
 
   public static boolean tryCreateFolder(File dir){
     if (!dir.exists()){
-      boolean created;
       try {
-        // create the file
-        created = dir.mkdir();
+        // create file
+        return dir.mkdir();
       } catch (Exception e) {
         log.warning("Unable to create dir " + dir.getAbsolutePath());
         e.printStackTrace();
-        created = false;
-      }
-
-      // if it didnt error but didnt create exit here.
-      if (!created) {
         return false;
       }
     }
@@ -40,6 +34,25 @@ public class FileUtils {
       }
     }
     return directoryToBeDeleted.delete();
+  }
+
+  public static boolean tryCreatePath(File file){
+    if (!file.exists()){
+      boolean created = true;
+      try {
+        // create the file
+        created = file.createNewFile();
+      } catch (Exception e) {
+        log.warning("Unable to create file " + file.getAbsolutePath());
+        e.printStackTrace();
+        created = false;
+      }
+      // if it didnt error but didnt create exit here.
+      if (!created) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public static boolean copyDirectory(Path src, Path dest) {

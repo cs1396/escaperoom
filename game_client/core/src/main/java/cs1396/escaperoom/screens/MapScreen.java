@@ -24,7 +24,6 @@ import cs1396.escaperoom.editor.events.EditorEvent.EventType;
 import cs1396.escaperoom.editor.events.EditorEventBus;
 import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.engine.assets.maps.MapData;
-import cs1396.escaperoom.engine.assets.maps.MapMetadata;
 import cs1396.escaperoom.engine.render.Drawable;
 import cs1396.escaperoom.engine.types.IntVector2;
 import cs1396.escaperoom.engine.types.Size;
@@ -42,12 +41,12 @@ public abstract class MapScreen extends AbstractScreen {
   protected Image room;
   public Grid grid;
   protected final Batch batch;
-  protected MapMetadata metadata;
+  protected MapData mapData;
   protected Size gridSize;
   protected CamMan cameraManager;
 
-  public MapMetadata getMetadata() {
-    return metadata;
+  public MapData getMapData() {
+    return mapData;
   }
 
   /**
@@ -187,10 +186,10 @@ public abstract class MapScreen extends AbstractScreen {
     super();
 
     this.batch = new SpriteBatch();
-    this.metadata = mapdata.getMetadata();
-    this.gridSize = mapdata.getGrid().getSize();
+    this.mapData = mapdata;
+    this.gridSize = mapdata.getStartGrid().getSize();
     this.cameraManager = new CamMan((OrthographicCamera) getCamera());
-    cameraManager.setZoom(metadata.gameSettings.defaultZoom);
+    cameraManager.setZoom(mapData.getMetadata().gameSettings.defaultZoom);
 
     // Add gridded room
     AssetManager.instance().load("textures/tile.png", Texture.class);

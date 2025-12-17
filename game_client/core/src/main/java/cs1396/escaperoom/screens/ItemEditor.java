@@ -360,8 +360,8 @@ public class ItemEditor extends AbstractScreen {
       transferProperties();
 
       // place our modified item
-      if (MapScreen.canPlace(newItem, newItem.position, mapData.getGrid())){
-        mapData.getGrid().placeItem(newItem);
+      if (MapScreen.canPlace(newItem, newItem.position, mapData.getStartGrid())){
+        mapData.getStartGrid().placeItem(newItem);
       } else {
         Notifier.error("Modified item no longer has a valid placement on the grid.");
         updateItemPosition();
@@ -369,11 +369,11 @@ public class ItemEditor extends AbstractScreen {
       }
 
       // save the map that contains the modified item
-      MapSaver.saveMap(mapData.getGrid(), mapData.getMetadata());
+      MapSaver.saveMap(mapData);
     } 
 
     // Reload the map and show the editor
-    MapLoader.tryLoadMap(mapData.getMetadata()).ifPresent((md) -> {
+    MapLoader.tryLoadMap(mapData.getMetadata()).inspect((md) -> {
       ScreenManager.instance().showScreen(new LevelEditor(md));
     });
   }

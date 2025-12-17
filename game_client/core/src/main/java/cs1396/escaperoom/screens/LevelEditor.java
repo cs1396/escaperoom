@@ -86,7 +86,7 @@ public class LevelEditor extends MapScreen {
     ui = new EditorUI(this, toolManager, dragManager, history, itemDrawer);
 
     setEditMode();
-    loadGrid(data.getGrid());
+    loadGrid(data.getStartGrid());
     cameraManager.setPosition(gridSize.width / 2, gridSize.height / 2);
   }
 
@@ -121,20 +121,20 @@ public class LevelEditor extends MapScreen {
     grid.placedItems.values().forEach((i) -> i.setSelected(false));
     clearGridView();
     CursorManager.restoreDefault();
-    ScreenManager.instance().showScreen(new SinglePlayerGame(new MapData(grid, metadata)));
+    ScreenManager.instance().showScreen(new SinglePlayerGame(mapData));
   }
 
   //----------------------------------------------------------------------------
   // ACCESSORS
   //----------------------------------------------------------------------------
 
+  public MapMetadata getMetadata() {
+    return mapData.getMetadata();
+  }
+
   /**
    * Get the {@link ItemSelectionTool} from this editor
    */
-  public MapMetadata getMetadata() {
-    return metadata;
-  }
-
   public ItemSelectionTool getSelectionTool() {
     return toolManager.getSelectTool();
   }
@@ -411,8 +411,8 @@ public class LevelEditor extends MapScreen {
   }
 
   public void reloadItems() {
-    MapLoader.reloadTextures(metadata);
-    metadata.objectDirectory.ifPresent((uo) -> ItemLoader.LoadUserObjects(uo));
+    MapLoader.reloadTextures(mapData.getMetadata());
+    mapData.getMetadata().objectDirectory.ifPresent((uo) -> ItemLoader.LoadUserObjects(uo));
 
     // update placed items
     grid.items.values().forEach(i -> {

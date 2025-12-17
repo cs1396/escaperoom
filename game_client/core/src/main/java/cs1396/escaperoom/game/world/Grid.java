@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.render.Drawable;
 import cs1396.escaperoom.engine.types.Size;
 import cs1396.escaperoom.game.entities.Item;
@@ -21,6 +22,16 @@ import cs1396.escaperoom.screens.MapScreen;
 
 public class Grid implements Json.Serializable {
   private static Logger log = Logger.getLogger(Grid.class.getName());
+
+  private String name = MapData.DEFAULT_GRID_NAME;
+
+  public String getName(){
+    return name;
+  }
+
+  public void setName(String newName){
+    this.name = newName;
+  }
 
   /**
    * {@code items} contains all items involved with this grid.

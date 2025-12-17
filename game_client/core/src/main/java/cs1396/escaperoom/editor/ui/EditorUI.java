@@ -28,7 +28,6 @@ import cs1396.escaperoom.editor.ui.Menu.MenuEntryBuilder;
 import cs1396.escaperoom.engine.assets.items.ItemLoader.LoadedObjects;
 import cs1396.escaperoom.engine.assets.items.ItemTypeData;
 import cs1396.escaperoom.engine.assets.maps.GameSettings;
-import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
 import cs1396.escaperoom.engine.types.IntVector2;
 import cs1396.escaperoom.game.entities.Item;
@@ -258,8 +257,7 @@ public class EditorUI {
     playButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (playButton.isChecked()) {
-          boolean s = MapSaver.saveMap(screen.getGrid(), screen.getMetadata());
-          if (s) {
+          if (MapSaver.saveMap(screen.getMapData())) {
             screen.setPlayMode();
             playButton.setChecked(false);
           } else {
@@ -274,8 +272,7 @@ public class EditorUI {
     saveButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (saveButton.isChecked()) {
-          boolean s = MapSaver.saveMap(screen.getGrid(), screen.getMetadata());
-          if (s) {
+          if (MapSaver.saveMap(screen.getMapData())) {
             Notifier.info("Map saved");
           } else {
             Notifier.warn("Map failed to save");
@@ -290,9 +287,8 @@ public class EditorUI {
     newItemBtn.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (newItemBtn.isChecked()) {
-          if (MapSaver.saveMap(screen.grid, screen.getMetadata())){
-            ScreenManager.instance().showScreen(new ItemEditor(
-              new MapData(screen.grid, screen.getMetadata()), null));
+          if (MapSaver.saveMap(screen.getMapData())){
+            ScreenManager.instance().showScreen(new ItemEditor(screen.getMapData(), null));
           } else {
             Notifier.error("Failed to save map");
           }

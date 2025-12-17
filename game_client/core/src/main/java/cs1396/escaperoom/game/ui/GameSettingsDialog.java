@@ -16,7 +16,16 @@ public class GameSettingsDialog extends SettingsDialog {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
           screen.calculateStatistics(false);
-          ScreenManager.instance().showScreen(new GameSummary(screen.stats, screen.getMetadata(), screen.getGameType()));
+
+          ScreenManager
+            .instance()
+            .showScreen(
+              new GameSummary(
+                screen.stats,
+                screen.getMapData().getMetadata(),
+                screen.getGameType()
+              )
+            );
         }
       });
 

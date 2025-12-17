@@ -7,7 +7,6 @@ import cs1396.escaperoom.editor.core.ToolManager.ToolType;
 import cs1396.escaperoom.editor.tools.DeletionTool.Deletion;
 import cs1396.escaperoom.editor.tools.EyeDropTool;
 import cs1396.escaperoom.editor.tools.RotationTool.RotationAction;
-import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.base.ItemProperty.MenuType;
@@ -42,9 +41,10 @@ public class ItemMenu extends Menu {
     add(new MenuEntryBuilder(this,"Edit Item Instance")
       .onClick(() -> {
         target.setSelected(false);
-        if (MapSaver.saveMap(editor.grid, editor.getMetadata())){
-          ScreenManager.instance().showScreen(new ItemEditor(
-            new MapData(editor.grid, editor.getMetadata()),  target), true
+        if (MapSaver.saveMap(editor.getMapData())){
+          ScreenManager.instance().showScreen(
+            new ItemEditor(editor.getMapData(), target),
+            true
           );
         } else {
           Notifier.error("Failed to save map");

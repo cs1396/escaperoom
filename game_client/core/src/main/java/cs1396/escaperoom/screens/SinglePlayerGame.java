@@ -16,6 +16,7 @@ import cs1396.escaperoom.game.entities.player.PlayerDetails;
 import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.utils.ScreenManager;
 import cs1396.escaperoom.ui.ScreenShotter;
+import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 
 public class SinglePlayerGame extends GameScreen {
@@ -24,7 +25,7 @@ public class SinglePlayerGame extends GameScreen {
 
   public SinglePlayerGame(MapData data, boolean verifying){
     super(data);
-    applyGrid(data.getGrid());
+    applyGrid(data.getStartGrid());
     this.gameType = verifying? GameType.Verifying : GameType.Standard;
 
     if (verifying){
@@ -37,7 +38,7 @@ public class SinglePlayerGame extends GameScreen {
 
   public SinglePlayerGame(MapData mapdata) {
     super(mapdata);
-    applyGrid(mapdata.getGrid());
+    applyGrid(mapdata.getStartGrid());
     this.gameType = GameType.Editor;
   }
 
@@ -77,9 +78,13 @@ public class SinglePlayerGame extends GameScreen {
     editButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (editButton.isChecked()) {
-          MapLoader.tryLoadMap(metadata).ifPresent((g) -> {
-            ScreenManager.instance().showScreen(new LevelEditor(g));
-          });
+          MapLoader.tryLoadMap(mapData.getMetadata())
+            .inspect(
+              g -> ScreenManager.instance().showScreen(new LevelEditor(g))
+            )
+            .inspect_err(
+              e -> Notifier.error(e.reason())
+            );
         }
       }
     });
@@ -98,6 +103,6 @@ public class SinglePlayerGame extends GameScreen {
 
   public void completeLevel(boolean success) {
     calculateStatistics(success);
-    ScreenManager.instance().showScreen(new GameSummary(stats, metadata, gameType));
+    ScreenManager.instance().showScreen(new GameSummary(stats, mapData.getMetadata(), gameType));
   }
 }

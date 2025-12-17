@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import cs1396.escaperoom.engine.assets.maps.MapLoader;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
+import cs1396.escaperoom.engine.types.Result;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapStats;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapStats.ValidStats;
 import cs1396.escaperoom.screens.GameScreen.GameType;
@@ -23,8 +24,8 @@ import cs1396.escaperoom.services.GameStatistics;
 import cs1396.escaperoom.services.MapUploader;
 import cs1396.escaperoom.services.Networking;
 import cs1396.escaperoom.services.User;
-import cs1396.escaperoom.services.MapUploader.UploadOutput;
 import cs1396.escaperoom.services.Networking.StatusCode;
+import cs1396.escaperoom.services.Networking.UploadResponse;
 import cs1396.escaperoom.ui.ConfirmDialog;
 import cs1396.escaperoom.ui.StatTable;
 import cs1396.escaperoom.ui.notifications.Notifier;
@@ -130,17 +131,17 @@ public class GameSummary extends MenuScreen {
           if (PlayAgainButton.this.isChecked()) {
             switch (gameType) {
               case Editor:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m));
                 });
                 break;
               case Standard:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m, false));
                 });
                 break;
               case Verifying:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m, true));
                 });
                 break;
@@ -239,19 +240,17 @@ public class GameSummary extends MenuScreen {
                   previousMetadata.stats = Optional.of(MapStats.fromGameStats(stats));
                   previousMetadata.stats.get().description = desc;
 
-                  waitFor(MapUploader.uploadMap(previousMetadata), (UploadOutput output) -> {
-                    output.reason.ifPresent((err) -> {
-                      Notifier.error(err);
-                    });
-
-                    output.response.ifPresent((rsp) -> {
-                      Notifier.info(String.format("%s successfully uploaded!", previousMetadata.name));
-                      previousMetadata.mapID = rsp.mapID;
-                      if (!MapSaver.updateMetadata(previousMetadata)) {
-                        Notifier.warn(String.format("%s failed to update metadata!", previousMetadata.name));
-                      }
-                      UploadButton.this.setDisabled(true);
-                    });
+                  waitFor(MapUploader.uploadMap(previousMetadata), (Result<UploadResponse, String> output) -> {
+                    output
+                      .inspect((rsp) -> {
+                        Notifier.info(String.format("%s successfully uploaded!", previousMetadata.name));
+                        previousMetadata.mapID = rsp.mapID;
+                        if (!MapSaver.updateMetadata(previousMetadata)) {
+                          Notifier.warn(String.format("%s failed to update metadata!", previousMetadata.name));
+                        }
+                        UploadButton.this.setDisabled(true);
+                      })
+                      .inspect_err(err -> Notifier.error(err));
                   }, "Uploading");
                   return true;
                 })

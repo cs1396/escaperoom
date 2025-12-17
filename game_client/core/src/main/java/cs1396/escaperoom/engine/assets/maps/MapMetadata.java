@@ -44,6 +44,7 @@ public class MapMetadata implements Json.Serializable {
     public String mapBasePath;
     public String mapContentPath;
     public String mapMainFilePath;
+    public String mapGridPath;
     public String mapMetadataPath;
     public String mapThumbnailPath;
     public boolean isDownloaded;
@@ -52,11 +53,18 @@ public class MapMetadata implements Json.Serializable {
       this.folderName = folderName;
       this.isDownloaded = isDownloaded;
 
-      if (isDownloaded) this.mapBasePath = FileUtils.getAppDataDir() + "/maps/downloaded/" + folderName;
-      else this.mapBasePath = FileUtils.getAppDataDir() + "/maps/local/" + folderName;
+      if (isDownloaded) {
+        this.mapBasePath = FileUtils.getAppDataDir() + "/maps/downloaded/" + folderName;
+      } else {
+        this.mapBasePath = FileUtils.getAppDataDir() + "/maps/local/" + folderName;
+      }
 
       this.mapContentPath = mapBasePath + "/content";
+
+      // Legacy path, only kept for backward compatability
       this.mapMainFilePath = mapBasePath + "/content/mapdata.json";
+
+      this.mapGridPath = mapBasePath + "/content/grids/";
       this.mapMetadataPath = mapBasePath + "/metadata.json";
       this.mapThumbnailPath = mapBasePath + "/thumbnail.png";
     }
@@ -69,6 +77,7 @@ public class MapMetadata implements Json.Serializable {
   public Optional<String> textureDirectory = Optional.empty();
   public Optional<String> objectDirectory = Optional.empty();
   public GameSettings gameSettings = new GameSettings();
+  String startingGrid = MapData.DEFAULT_GRID_NAME;
 
   public MapMetadata(String name, boolean downloaded){
     this.locations = new MapLocation(name, downloaded);
@@ -77,8 +86,7 @@ public class MapMetadata implements Json.Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof MapMetadata){
-      MapMetadata other = MapMetadata.class.cast(obj);
+    if (obj instanceof MapMetadata other){
       if (this.mapID.isEmpty() || other.mapID.isEmpty()){
         return this.name.equals(other.name);
       } else {
@@ -107,6 +115,11 @@ public class MapMetadata implements Json.Serializable {
     json.writeValue("game_settings", gameSettings);
     json.writeValue("id", this.mapID);
     json.writeValue("name", this.name);
+
+
+    json.writeObjectStart("grids");
+    json.writeValue("start", startingGrid);
+    json.writeObjectEnd();
   }
 
   @Override
@@ -120,6 +133,13 @@ public class MapMetadata implements Json.Serializable {
     JsonValue settingsData = jsonData.get("game_settings");
     gameSettings = new GameSettings();
     if (settingsData != null) gameSettings = json.readValue(GameSettings.class, settingsData);
+
+    JsonValue gridMetaData = jsonData.get("grids");
+
+    // Legacy Metadata
+    if (gridMetaData == null) return;
+
+    startingGrid = gridMetaData.getString("start");
   }
 
   @Override

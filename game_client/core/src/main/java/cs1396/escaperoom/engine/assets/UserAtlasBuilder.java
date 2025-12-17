@@ -6,6 +6,10 @@ import java.util.logging.Logger;
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
+import cs1396.escaperoom.engine.types.Result;
+import cs1396.escaperoom.engine.types.Result.IOErr;
+import cs1396.escaperoom.engine.types.Result.Ok;
+
 public class UserAtlasBuilder {
   static Logger log = Logger.getLogger(UserAtlasBuilder.class.getName());
 
@@ -17,28 +21,21 @@ public class UserAtlasBuilder {
    * 2. there are textures in the user texture directory which 
    * are newer than the atlas
    */
-  private static boolean needsBuild(File textureDir, String atlasPath){
-    File atlasFile = new File(atlasPath);
-    if (!atlasFile.exists()){
-      return true;
-    }
+  private static boolean needsBuild(File textureDir, File atlas){
+    if (!atlas.exists()) return true; 
 
     for (File f : textureDir.listFiles()){
-      if (f.lastModified() > atlasFile.lastModified()){
-        return true;
-      }
+      if (f.lastModified() > atlas.lastModified()) return true;
     }
 
     return false;
-
   }
 
-  public static Optional<String> buildAtlas(String textureDirPath){
+  public static Result<File, String> buildAtlas(String textureDirPath){
     File textureDir = new File(textureDirPath);
 
     if (!textureDir.exists()){
-        log.warning("Texture path (" + textureDir.getPath() + ") does not exist");
-        return Optional.empty();
+      return IOErr.withLog("Texture path (" + textureDir.getPath() + ") does not exist", log);
     }
 
     String atlasDirPath = textureDir.getParent() + "/texture_atlas";
@@ -47,26 +44,29 @@ public class UserAtlasBuilder {
 
     if (!atlasDir.exists()){
       if (!atlasDir.mkdir()){
-        log.warning("Failed to create atlas dir: " + atlasDir.getAbsolutePath());
-        return Optional.empty();
+        return IOErr.withLog("Failed to create atlas dir: " + atlasDir.getAbsolutePath(), log);
       }
     }
 
-    String atlasPath = atlasDir.getAbsolutePath() + "/atlas.atlas";
+    File atlas = new File(atlasDir, "atlas.atlas");
 
-    if (!needsBuild(textureDir, atlasPath)){
-      return Optional.of(atlasPath);
+    if (!needsBuild(textureDir, atlas)){
+      return new Ok<>(atlas);
     }
 
-    TexturePacker.Settings settings = new TexturePacker.Settings();
-    settings.paddingX = 0;
-    settings.paddingY = 0;
-    settings.maxWidth = 2048;
-    settings.maxHeight = 2048;
-    settings.bleed = false;
-    TexturePacker.process(settings, textureDir.getAbsolutePath(), atlasDir.getAbsolutePath(), "atlas");
-    AssetManager.instance().invalidateTextureCache();
-
-    return Optional.of(atlasPath);
+    try {
+      TexturePacker.Settings settings = new TexturePacker.Settings();
+      settings.paddingX = 0;
+      settings.paddingY = 0;
+      settings.maxWidth = 2048;
+      settings.maxHeight = 2048;
+      settings.bleed = false;
+      TexturePacker.process(settings, textureDir.getAbsolutePath(), atlasDir.getAbsolutePath(), "atlas");
+      AssetManager.instance().invalidateTextureCache();
+      return new Ok<>(atlas);
+    } catch (Exception e){
+      e.printStackTrace();
+      return IOErr.withLog("Failed to pack atlas", log);
+    }
   }
 }
