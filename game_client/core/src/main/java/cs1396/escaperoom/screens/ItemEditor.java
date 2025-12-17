@@ -373,7 +373,7 @@ public class ItemEditor extends AbstractScreen {
     } 
 
     // Reload the map and show the editor
-    MapLoader.tryLoadMap(mapData.getMetadata()).ifPresent((md) -> {
+    MapLoader.tryLoadMap(mapData.getMetadata()).inspect((md) -> {
       ScreenManager.instance().showScreen(new LevelEditor(md));
     });
   }

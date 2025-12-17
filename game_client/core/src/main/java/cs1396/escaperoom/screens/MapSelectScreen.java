@@ -132,9 +132,10 @@ public class MapSelectScreen extends MenuScreen {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
             if (PlayButton.this.isChecked()) {
-              MapLoader.tryLoadMap(data, settings.creation).ifPresent((g) -> {
+              MapLoader.tryLoadMap(data, settings.creation).inspect((g) -> {
                 ScreenManager.instance().showScreen(new SinglePlayerGame(g, false));
-              });
+              })
+              .inspect_err((e) -> Notifier.error(e.reason()));
             }
           }
         });
@@ -305,9 +306,10 @@ public class MapSelectScreen extends MenuScreen {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
             if (EditButton.this.isChecked()) {
-              MapLoader.tryLoadMap(data, settings.creation).ifPresent((g) -> {
+              MapLoader.tryLoadMap(data, settings.creation).inspect((g) -> {
                 ScreenManager.instance().showScreen(new LevelEditor(g));
-              });
+              })
+              .inspect_err(e -> Notifier.error(e.reason()));
             }
           }
 
@@ -323,9 +325,10 @@ public class MapSelectScreen extends MenuScreen {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
             if (VerifyButton.this.isChecked()) {
-              MapLoader.tryLoadMap(data, settings.creation).ifPresent((g) -> {
+              MapLoader.tryLoadMap(data, settings.creation).inspect((g) -> {
                 ScreenManager.instance().showScreen(new SinglePlayerGame(g, true));
-              });
+              })
+              .inspect_err(e -> Notifier.error(e.reason()));
             }
           }
         });

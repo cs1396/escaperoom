@@ -130,17 +130,17 @@ public class GameSummary extends MenuScreen {
           if (PlayAgainButton.this.isChecked()) {
             switch (gameType) {
               case Editor:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m));
                 });
                 break;
               case Standard:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m, false));
                 });
                 break;
               case Verifying:
-                MapLoader.tryLoadMap(previousMetadata).ifPresent((m) -> {
+                MapLoader.tryLoadMap(previousMetadata).inspect((m) -> {
                   ScreenManager.instance().showScreen(new SinglePlayerGame(m, true));
                 });
                 break;

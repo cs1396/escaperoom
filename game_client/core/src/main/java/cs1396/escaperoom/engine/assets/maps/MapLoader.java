@@ -2,7 +2,6 @@ package cs1396.escaperoom.engine.assets.maps;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -20,11 +19,20 @@ import cs1396.escaperoom.engine.assets.items.ItemLoader;
 import cs1396.escaperoom.engine.assets.items.ItemLoader.LoadedObjects;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapLocation;
 import cs1396.escaperoom.engine.assets.utils.FileUtils;
+import cs1396.escaperoom.engine.types.Result;
+import cs1396.escaperoom.engine.types.Result.Err;
+import cs1396.escaperoom.engine.types.Result.Ok;
 import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.AbstractScreen;
 
 public class MapLoader {
   private static Logger log = Logger.getLogger(MapLoader.class.getName());
+
+  public record MapLoadErr(String reason) {
+    public Err<MapData, MapLoadErr> asErr(){
+      return new Err<>(this);
+    }
+  }
 
   public static Array<MapMetadata> discoverMaps(){
     Array<MapMetadata> maps = new Array<>();
@@ -57,21 +65,20 @@ public class MapLoader {
     return maps;
   }
 
-  public static Optional<MapData> tryLoadMap(MapMetadata data){
+  public static Result<MapData, MapLoadErr> tryLoadMap(MapMetadata data){
     return tryLoadMap(data, false);
-
   }
 
   /**
    * Load a legacy map that defines {@code MAPDIR/content/mapdata.json} 
    * by transitioning that data into the new file struture
    */
-  private static Optional<MapData> tryLoadLegacyMap(MapMetadata metadata){
+  private static Result<MapData, MapLoadErr> tryLoadLegacyMap(MapMetadata metadata){
 
     log.info("Legacy Map file detected, transitioning to new structure");
     // Transition from old file structure to new one
     if(!FileUtils.tryCreateFolder(new File(metadata.locations.mapGridPath))){
-      return Optional.empty();
+      return new MapLoadErr("").asErr();
     }
 
     File legacyMapFile = new File(metadata.locations.mapMainFilePath);
@@ -91,7 +98,7 @@ public class MapLoader {
           newMapFile.getAbsolutePath()
         )
       );
-      return Optional.empty();
+      return new MapLoadErr("Failed to transition legacy map data").asErr();
     }
 
     log.info(
@@ -101,7 +108,7 @@ public class MapLoader {
       log.warning(
         String.format("Error removing old map data at", legacyMapFile.getAbsolutePath())
       );
-      return Optional.empty();
+      return new MapLoadErr("Failed to delete legacy map data").asErr();
     }
 
     log.info("Updating and saving new metadata");
@@ -109,7 +116,7 @@ public class MapLoader {
 
     if (!MapSaver.updateMetadata(metadata)){
       log.warning("Failed to save new metadata");
-      return Optional.empty();
+      return new MapLoadErr("Failed to transition from legacy map data").asErr();
     }
 
     return tryLoadMulitGridMap(metadata, false);
@@ -121,7 +128,7 @@ public class MapLoader {
    * @param metadata for the map 
    * @param create whether to create the map if it doesn't exist
    */
-  private static Optional<MapData> tryLoadMulitGridMap(MapMetadata metadata, boolean create){
+  private static Result<MapData, MapLoadErr> tryLoadMulitGridMap(MapMetadata metadata, boolean create){
 
     File gridFolder = new File(metadata.locations.mapGridPath);
 
@@ -139,7 +146,7 @@ public class MapLoader {
     // If the folder doesn't exist and we aren't creating -> invalid
     if (!gridFolderValid && !create){
       log.warning("Cannot load map with no defined grids: " + gridFolder.getAbsolutePath());
-      return Optional.empty();
+      return new MapLoadErr("Cannot load map with no defined grids: " + gridFolder.getAbsolutePath()).asErr();
     }
 
     MapData mapData = new MapData(metadata);
@@ -152,9 +159,9 @@ public class MapLoader {
 
       if (!MapSaver.saveMap(mapData)){
         log.warning(String.format("Failed to save new map %s", metadata.name));
-        return Optional.empty();
+        return new MapLoadErr("Failed to save new map " + metadata.name).asErr();
       }
-      return Optional.of(mapData);
+      return new Ok<>(mapData);
     }
     
     boolean foundStart = false;
@@ -174,16 +181,17 @@ public class MapLoader {
     }
 
     if (!foundStart){
-      log.severe(
-        String.format("Did not find starting grid \"%s\" in %s",
+      String errMsg = String.format(
+        "Did not find starting grid \"%s\" in %s",
           metadata.startingGrid,
           gridFolder.getAbsolutePath()
-        )
-      );
-      return Optional.empty();
+        );
+
+      log.severe(errMsg);
+      return new MapLoadErr(errMsg).asErr();
     }
 
-    return Optional.of(mapData);
+    return new Ok<>(mapData);
   }
 
   /**
@@ -194,13 +202,13 @@ public class MapLoader {
    *
    * @return {@code Optional.empty()} on failure, {@code Optional.of(MapData)} on success
    */
-  public static Optional<MapData> tryLoadMap(MapMetadata metadata, boolean create){
+  public static Result<MapData, MapLoadErr> tryLoadMap(MapMetadata metadata, boolean create){
     LoadedObjects.clearUserItems();
     AssetManager.instance().invalidateTextureCache();
 
-    if (!tryLoadTextures(metadata)) return Optional.empty();
+    if (!tryLoadTextures(metadata)) return new Err<>(new MapLoadErr("Failed to load texture directory"));
 
-    if (!tryLoadObjects(metadata)) return Optional.empty();
+    if (!tryLoadObjects(metadata)) return new Err<>(new MapLoadErr("Failed to load object directory"));;
 
     File legacyMapPath = new File(metadata.locations.mapMainFilePath);
     if (legacyMapPath.exists()){
@@ -246,8 +254,9 @@ public class MapLoader {
 
   }
 
-  public static Optional<MapData> loadMap(MapLocation id) {
-    return tryLoadMetaData(id).flatMap((meta) -> tryLoadMap(meta));
+  public static Result<MapData, MapLoadErr> loadMap(MapLocation id) {
+    return Result.okOr(tryLoadMetaData(id), new MapLoadErr("Failed to load map"))
+      .flatMap(meta -> tryLoadMap(meta));
   }
 
   public static boolean reloadTextures(MapMetadata data){
@@ -378,8 +387,8 @@ public class MapLoader {
     try {
       FileReader fr = new FileReader(metadataFile);
       json = new JsonReader().parse(fr);
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
       log.warning(String.format("Exception while reading metadata file (%s)", metadataFile.getAbsolutePath()));
       return Optional.empty();
     }

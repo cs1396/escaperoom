@@ -16,6 +16,7 @@ import cs1396.escaperoom.game.entities.player.PlayerDetails;
 import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.utils.ScreenManager;
 import cs1396.escaperoom.ui.ScreenShotter;
+import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 
 public class SinglePlayerGame extends GameScreen {
@@ -77,9 +78,13 @@ public class SinglePlayerGame extends GameScreen {
     editButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         if (editButton.isChecked()) {
-          MapLoader.tryLoadMap(mapData.getMetadata()).ifPresent((g) -> {
-            ScreenManager.instance().showScreen(new LevelEditor(g));
-          });
+          MapLoader.tryLoadMap(mapData.getMetadata())
+            .inspect(
+              g -> ScreenManager.instance().showScreen(new LevelEditor(g))
+            )
+            .inspect_err(
+              e -> Notifier.error(e.reason())
+            );
         }
       }
     });
