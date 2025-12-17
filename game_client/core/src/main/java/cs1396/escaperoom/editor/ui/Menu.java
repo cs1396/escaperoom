@@ -168,9 +168,8 @@ public class Menu extends G24Window {
 
   public static class MenuLabel extends G24Label {
     public MenuLabel(String label){
-      super(label, "default", 0.65f);
+      super(label, "default");
     }
-
   }
 
   public static class MenuEntry extends Table {
@@ -274,6 +273,11 @@ public class Menu extends G24Window {
       return entry;
     }
 
+    public static MenuEntry sectionLabel(String content){
+      MenuEntry entry = new MenuEntry(null, new G24Label(content, "default-med-text"), null, null, null, null, false);
+      return entry;
+    }
+
     /**
      * Does not call any callbacks, meant for reinitialization
      */
@@ -338,7 +342,7 @@ public class Menu extends G24Window {
       onSelect = selectHandler;
       onDeselect = deselectHandler;
 
-      if (spawner != null) add(new G24Label(">", "default", 0.65f)).right().padRight(2);
+      if (spawner != null) add(new G24Label(">", "default")).right().padRight(2);
 
       addListener(new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) { 
@@ -415,11 +419,15 @@ public class Menu extends G24Window {
   }
 
 	public Menu(@Null MenuEntry parentMenu, String title, AbstractScreen screen) {
-		super(title, "menu");
+    this(parentMenu, title, screen, false);
+	}
+
+	public Menu(@Null MenuEntry parentMenu, String title, AbstractScreen screen, boolean largeHeading) {
+		super(title, largeHeading ? "menu-med-text" : "menu" );
     this.screen = screen;
     parent = parentMenu;
 
-    padTop(20);
+    padTop(30);
     padLeft(5);
     defaults().pad(0).align(Align.topLeft).expandX().growX();
     add(MenuEntry.divider()).growX().row();

@@ -47,11 +47,11 @@ public class MapMetadata implements Json.Serializable {
     public String mapGridPath;
     public String mapMetadataPath;
     public String mapThumbnailPath;
-    public boolean isDownloaded;
+    public boolean isOnline;
 
     public MapLocation(String folderName, boolean isDownloaded){
       this.folderName = folderName;
-      this.isDownloaded = isDownloaded;
+      this.isOnline = isDownloaded;
 
       if (isDownloaded) {
         this.mapBasePath = FileUtils.getAppDataDir() + "/maps/downloaded/" + folderName;

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import cs1396.escaperoom.editor.core.ActionHistory;
@@ -37,6 +38,7 @@ import cs1396.escaperoom.game.entities.properties.values.Style;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.screens.utils.ScreenManager;
+import cs1396.escaperoom.ui.FontManager;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Label;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
@@ -81,7 +83,11 @@ public class EditorUI {
     ItemHintMode hintMode = ItemHintMode.Hover;
 
     ItemHint(){
-      super ("<no item> ID: -", "bubble", 0.6f);
+      super ("<no item> ID: -", "bubble");
+
+      LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
+      smallStyle.font = FontManager.size(16);
+      setStyle(smallStyle);
     }
 
     public void update(int x, int y) {
@@ -114,10 +120,15 @@ public class EditorUI {
   }
 
   public class CoordHints extends HorizontalGroup {
-    private G24Label coords = new G24Label("x: _ y: _", "bubble", 0.6f);
+    private G24Label coords = new G24Label("x: _ y: _", "bubble");
     private final int maxX, maxY;
 
     public CoordHints() {
+
+      LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
+      smallStyle.font = FontManager.size(16);
+      coords.setStyle(smallStyle);
+
       maxX = LevelEditor.WORLD_WIDTH - 1;
       maxY = LevelEditor.WORLD_HEIGHT - 1;
       space(5);
@@ -169,7 +180,7 @@ public class EditorUI {
     root.top().left();
 
 
-    Menu sideBar = new Menu(null, screen.getMetadata().name , screen);
+    Menu sideBar = new Menu(null, screen.getMetadata().name , screen, true);
     sideBar.defaults().width(250);
     sideBar.setMovable(false);
 
@@ -217,12 +228,12 @@ public class EditorUI {
     ).row();
 
     sideBar.addDivider();
-    sideBar.add(MenuEntry.label("Tools")).row();
+    sideBar.add(MenuEntry.sectionLabel("Tools")).row();
     sideBar.addDivider();
     sideBar.add(toolDrawer).center().pad(0).row();
 
     sideBar.addDivider();
-    sideBar.add(MenuEntry.label("Items")).row();
+    sideBar.add(MenuEntry.sectionLabel("Items")).row();
     sideBar.addDivider();
 
     // add item drawer

@@ -81,7 +81,7 @@ public class MapSaver {
    */
   public static boolean saveMap(MapData data) {
     File dir = new File(data.metadata.locations.mapGridPath);
-    if (!dir.mkdirs()){
+    if (!dir.exists() && !dir.mkdirs()){
       return false;
     }
 

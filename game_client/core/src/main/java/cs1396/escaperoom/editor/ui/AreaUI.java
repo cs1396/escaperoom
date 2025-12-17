@@ -97,16 +97,16 @@ public class AreaUI extends Table implements HandlesMenuClose {
       selector.setRegion(region);
     });
 
-    add(new G24Label("x", "bubble", 0.65f));
+    add(new G24Label("x", "bubble"));
     add(xi).row();
 
     add(new G24Label("y", "bubble"));
     add(yi).row();
 
-    add(new G24Label("width", "bubble", 0.65f));
+    add(new G24Label("width", "bubble"));
     add(wi).row();
 
-    add(new G24Label("height", "bubble", 0.65f));
+    add(new G24Label("height", "bubble"));
     add(hi).row();
 
     selectAreaButton = new G24TextButton("SelectArea");

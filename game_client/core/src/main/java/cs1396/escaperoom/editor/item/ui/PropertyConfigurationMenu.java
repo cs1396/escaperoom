@@ -11,7 +11,7 @@ import cs1396.escaperoom.ui.widgets.G24Label;
 public class PropertyConfigurationMenu extends Menu {
   private class SpecialLittleTinyBabyLabel extends G24Label implements HandlesMenuClose {
     SpecialLittleTinyBabyLabel(String content){
-      super(content, "default", 0.65f);
+      super(content, "default");
       setWrap(true);
       setWidth(150);
     }
@@ -59,7 +59,7 @@ public class PropertyConfigurationMenu extends Menu {
           ConfigurationMenu.VGroup conflicts = new ConfigurationMenu.VGroup();
           property.getDescription().mutallyExclusiveWith.forEach((p) -> {
             if (p != property.getType()){
-              conflicts.addActor(new G24Label(p.getEmptyProperty().getDescription().name, "bubble", 0.65f));
+              conflicts.addActor(new G24Label(p.getEmptyProperty().getDescription().name, "bubble"));
             }
           });
 

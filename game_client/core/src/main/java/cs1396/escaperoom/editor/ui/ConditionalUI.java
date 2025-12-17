@@ -112,8 +112,8 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
       innerVGroup.space(10);
       innerVGroup.align(Align.center);
 
-      label = cond.getType() == ConditionalType.EmptyConditional ? new G24Label("<empty>", "bubble", 0.65f)
-          : new G24Label(cond.getName(), "bubble", 0.65f);
+      label = cond.getType() == ConditionalType.EmptyConditional ? new G24Label("<empty>", "bubble")
+          : new G24Label(cond.getName(), "bubble");
       innerVGroup.addActor(label);
 
       // add a remove source
@@ -176,10 +176,10 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     public Payload dragStart(InputEvent event, float x, float y, int pointer) {
       Payload p = new Payload();
       source.setVisible(false);
-      G24Label valid = new G24Label(source.val.getName(), "bubble", 0.65f);
+      G24Label valid = new G24Label(source.val.getName(), "bubble");
       valid.setColor(0.75f, 1, 0.75f, 0.5f);
 
-      G24Label invalid = new G24Label(source.val.getName(), "bubble", 0.65f);
+      G24Label invalid = new G24Label(source.val.getName(), "bubble");
       invalid.setColor(1, 0.75f, 0.75f, 0.5f);
 
       p.setValidDragActor(valid);
@@ -222,7 +222,7 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     Conditional c;
 
     public ConditionalSource(Conditional c) {
-      super(new G24Label(c.getName(), "bubble", 0.65f));
+      super(new G24Label(c.getName(), "bubble"));
       getActor().addListener(CursorManager.hoverHelper(CursorType.Hand));
       this.c = c;
     }
@@ -231,10 +231,10 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     public Payload dragStart(InputEvent event, float x, float y, int pointer) {
       Payload p = new Payload();
 
-      G24Label valid = new G24Label(c.getName(), "bubble", 0.65f);
+      G24Label valid = new G24Label(c.getName(), "bubble");
       valid.setColor(0.75f, 1, 0.75f, 0.5f);
 
-      G24Label invalid = new G24Label(c.getName(), "bubble", 0.65f);
+      G24Label invalid = new G24Label(c.getName(), "bubble");
       invalid.setColor(1, 0.75f, 0.75f, 0.5f);
 
       p.setValidDragActor(valid);

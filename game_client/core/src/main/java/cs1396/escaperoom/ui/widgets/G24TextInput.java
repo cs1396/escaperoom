@@ -1,16 +1,18 @@
 package cs1396.escaperoom.ui.widgets;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 
 import cs1396.escaperoom.engine.BackManager;
 import cs1396.escaperoom.engine.control.ControlsManager;
 import cs1396.escaperoom.screens.AbstractScreen;
+import cs1396.escaperoom.ui.FontManager;
 import cs1396.escaperoom.ui.notifications.Notifier;
 
 public class G24TextInput extends TextArea {
@@ -23,6 +25,26 @@ public class G24TextInput extends TextArea {
   }
   public interface OnEnter {
     public void perform();
+  }
+
+  public static class StringInput extends G24TextInput {
+    public interface OnStringChange{
+      public void onChange(String newVal);
+    }
+
+    public StringInput(String initialValue, OnStringChange onChange){
+      super(initialValue);
+
+      addListener(new ChangeListener() {
+        @Override
+        public void changed(ChangeEvent event, Actor actor) {
+          String newValueStr = getText();
+          if (newValueStr.isBlank() || newValueStr.isEmpty()) return; 
+
+          onChange.onChange(newValueStr);
+        }
+      });
+    }
   }
 
   private class G24InputListener extends TextAreaListener {
@@ -91,15 +113,15 @@ public class G24TextInput extends TextArea {
 
 
   public G24TextInput() {
-    this("", AbstractScreen.skin);
+    this("", "default");
   }
-  public G24TextInput(String text) {
-    this(text, AbstractScreen.skin);
-  }
-  public G24TextInput(String text, Skin skin) {
-    super(text, skin);
 
-    getStyle().font.getData().setScale(0.65f);
+  public G24TextInput(String text) {
+    this(text, "default");
+  }
+
+  public G24TextInput(String text, String style) {
+    super(text, AbstractScreen.skin, style);
     setMultiline(false);
     setOnEnter(() -> {});
     setFilter(c -> true);
