@@ -7,7 +7,6 @@ import cs1396.escaperoom.editor.core.ToolManager.ToolType;
 import cs1396.escaperoom.editor.tools.DeletionTool.Deletion;
 import cs1396.escaperoom.editor.tools.EyeDropTool;
 import cs1396.escaperoom.editor.tools.RotationTool.RotationAction;
-import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.base.ItemProperty.MenuType;

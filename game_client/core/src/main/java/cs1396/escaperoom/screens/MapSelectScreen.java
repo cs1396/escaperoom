@@ -23,13 +23,13 @@ import cs1396.escaperoom.engine.assets.maps.MapMetadata;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapLocation;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapStats;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
+import cs1396.escaperoom.engine.types.Result;
 import cs1396.escaperoom.engine.types.Size;
 import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.utils.ScreenManager;
 import cs1396.escaperoom.services.MapDownloader;
-import cs1396.escaperoom.services.MapDownloader.DownloadOutput;
 import cs1396.escaperoom.services.MapUploader;
-import cs1396.escaperoom.services.MapUploader.UploadOutput;
+import cs1396.escaperoom.services.Networking.UploadResponse;
 import cs1396.escaperoom.services.User;
 import cs1396.escaperoom.ui.ConfirmDialog;
 import cs1396.escaperoom.ui.MapStatDialog;
@@ -236,14 +236,10 @@ public class MapSelectScreen extends MenuScreen {
                 return;
               }
 
-              waitFor(MapUploader.uploadMap(data), (UploadOutput output) -> {
-                output.reason.ifPresent((err) -> {
-                  Notifier.error(err);
-                });
-                output.response.ifPresent((rsp) -> {
-                  Notifier.info(String.format("%s successfully uploaded!", data.name));
-                  System.out.println("MapID: `%s`\n");
-                });
+              waitFor(MapUploader.uploadMap(data), (Result<UploadResponse, String> output) -> {
+                output
+                  .inspect(rsp -> Notifier.info(String.format("%s successfully uploaded!", data.name)))
+                  .inspect_err(e -> Notifier.error(e));
               }, "Uploading");
             }
           }
@@ -268,14 +264,13 @@ public class MapSelectScreen extends MenuScreen {
                 Notifier.error("You must be logged in to download a map!");
                 return;
               }
-              waitFor(MapDownloader.downloadMap(data), (DownloadOutput output) -> {
-                output.reason.ifPresent((err) -> {
-                  Notifier.error(err);
-                });
-                output.response.ifPresent((rsp) -> {
-                  DownloadButton.this.setDisabled(true);
-                  Notifier.info(String.format("%s successfully downloaded!", data.name));
-                });
+              waitFor(MapDownloader.downloadMap(data), output -> {
+                output
+                  .inspect_err(e -> Notifier.error(e))
+                  .inspect(rsp -> {
+                    DownloadButton.this.setDisabled(true);
+                    Notifier.info(String.format("%s successfully downloaded!", data.name));
+                  });
               }, "Downloading " + data.name);
             }
           }

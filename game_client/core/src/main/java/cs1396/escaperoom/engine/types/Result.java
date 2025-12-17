@@ -3,12 +3,25 @@ package cs1396.escaperoom.engine.types;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
-public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Result.Ok, cs1396.escaperoom.engine.types.Result.Err {
+public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Result.Ok, cs1396.escaperoom.engine.types.Result.Err, cs1396.escaperoom.engine.types.Result.IOErr {
 
   public record Err<T, E>(E val) implements Result<T, E> {};
-  public record Ok<T, E>(T val) implements Result<T, E> {};
+  public record Ok<T, E>(T val) implements Result<T, E> {
+    public final static Ok<Void, ?> Unit = new Ok<>(null);
+    public static <E> Ok<Void,E> unit(){
+      return new Ok<>(null);
+    }
+  };
+  public record IOErr<T>(String reason) implements Result<T, String> {
+    public static <T> IOErr<T> withLog(String reason, Logger log) {
+      log.severe(reason);
+      return new IOErr<>(reason);
+    }
+  };
 
   default boolean isOk() {
     return this instanceof Ok<?, ?>;
@@ -97,6 +110,15 @@ public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Resu
     return this;
   }
 
+  default <U> CompletableFuture<Result<U, E>> andThenAsync(
+      Function<Void, CompletableFuture<Result<U, E>>> f) {
+    if (this.isErr()){
+      return CompletableFuture.completedFuture((Result<U, E>) this);
+    }
+    return f.apply(null);
+  }
+
+
   static <T, E> Result<T, E> okOr(Optional<T> opt, E err) {
     return opt.<Result<T, E>>map(Ok::new).orElseGet(() -> new Err<>(err));
   }
@@ -104,6 +126,13 @@ public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Resu
   static <T, E> Result<T, E> okOrElse(Optional<T> opt, Supplier<E> errFn) {
     return opt.<Result<T, E>>map(Ok::new).orElseGet(() -> new Err<>(errFn.get()));
   }
+
+  default java.util.Optional<T> ok() {
+    if (this instanceof Ok<T, E> ok) {
+        return Optional.of(ok.val());
+    }
+    return Optional.empty();
+}
 
 }
 

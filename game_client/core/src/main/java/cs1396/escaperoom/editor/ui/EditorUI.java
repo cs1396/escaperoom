@@ -28,7 +28,6 @@ import cs1396.escaperoom.editor.ui.Menu.MenuEntryBuilder;
 import cs1396.escaperoom.engine.assets.items.ItemLoader.LoadedObjects;
 import cs1396.escaperoom.engine.assets.items.ItemTypeData;
 import cs1396.escaperoom.engine.assets.maps.GameSettings;
-import cs1396.escaperoom.engine.assets.maps.MapData;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
 import cs1396.escaperoom.engine.types.IntVector2;
 import cs1396.escaperoom.game.entities.Item;

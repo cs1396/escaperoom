@@ -2,6 +2,7 @@ package cs1396.escaperoom.engine.assets.maps;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOError;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -21,6 +22,7 @@ import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapLocation;
 import cs1396.escaperoom.engine.assets.utils.FileUtils;
 import cs1396.escaperoom.engine.types.Result;
 import cs1396.escaperoom.engine.types.Result.Err;
+import cs1396.escaperoom.engine.types.Result.IOErr;
 import cs1396.escaperoom.engine.types.Result.Ok;
 import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.AbstractScreen;
@@ -56,10 +58,11 @@ public class MapLoader {
     }
 
     for (String mapFolder : FileUtils.getFolders(localLoc)){
-      tryLoadMetaData(new MapLocation(mapFolder, false)).ifPresent((m) -> maps.add(m));
+      tryLoadMetaData(new MapLocation(mapFolder, false)).inspect((m) -> maps.add(m));
     }
+
     for (String mapFolder : FileUtils.getFolders(dlLoc)){
-      tryLoadMetaData(new MapLocation(mapFolder, true)).ifPresent((m) -> maps.add(m));
+      tryLoadMetaData(new MapLocation(mapFolder, true)).inspect((m) -> maps.add(m));
     }
 
     return maps;
@@ -200,22 +203,23 @@ public class MapLoader {
    * @param metadata for the map 
    * @param create whether to create the map if it doesn't exist
    *
-   * @return {@code Optional.empty()} on failure, {@code Optional.of(MapData)} on success
+   * @return {@code Err(MapLoadErr)} on failure, {@code Ok(MapData)} on success
    */
   public static Result<MapData, MapLoadErr> tryLoadMap(MapMetadata metadata, boolean create){
     LoadedObjects.clearUserItems();
     AssetManager.instance().invalidateTextureCache();
-
-    if (!tryLoadTextures(metadata)) return new Err<>(new MapLoadErr("Failed to load texture directory"));
-
-    if (!tryLoadObjects(metadata)) return new Err<>(new MapLoadErr("Failed to load object directory"));;
-
     File legacyMapPath = new File(metadata.locations.mapMainFilePath);
-    if (legacyMapPath.exists()){
-      return tryLoadLegacyMap(metadata);
-    } else {
-      return tryLoadMulitGridMap(metadata, create);
-    }
+
+    return tryLoadTextures(metadata)
+      .mapErr(MapLoadErr::new)
+      .andThen(__ -> tryLoadObjects(metadata).mapErr(MapLoadErr::new))
+      .andThen(__ -> {
+        if (legacyMapPath.exists()){
+          return tryLoadLegacyMap(metadata);
+        } else {
+          return tryLoadMulitGridMap(metadata, create);
+        }
+      });
   }
 
   /**
@@ -255,96 +259,83 @@ public class MapLoader {
   }
 
   public static Result<MapData, MapLoadErr> loadMap(MapLocation id) {
-    return Result.okOr(tryLoadMetaData(id), new MapLoadErr("Failed to load map"))
+    return tryLoadMetaData(id)
+      .mapErr(MapLoadErr::new)
       .flatMap(meta -> tryLoadMap(meta));
   }
 
   public static boolean reloadTextures(MapMetadata data){
-    return tryLoadTextures(data, true);
+    return tryLoadTextures(data, true).isOk();
   }
 
-  private static boolean tryLoadTextures(MapMetadata data, boolean reload){
+  private static Result<Void, String> tryLoadTextures(MapMetadata data, boolean reload){
     if (data.textureDirectory.isPresent()) {
-      Optional<TextureAtlas> maybeAtlas = tryBuildAtlas(data.textureDirectory.get(), reload);
-      if (maybeAtlas.isEmpty()) {
-        return false;
-      }
-      AssetManager.instance().registerUserAtlas(maybeAtlas.get());
+      return tryBuildAtlas(data.textureDirectory.get(), reload).match(
+        atlas -> {
+          AssetManager.instance().registerUserAtlas(atlas);
+          return Ok.unit();
+        }, 
+        e -> new Err<>(e)
+      );
     }
-    return true;
+    return Ok.unit();
   }
 
-  public static boolean tryLoadTextures(MapMetadata data){
+  public static Result<Void, String> tryLoadTextures(MapMetadata data){
     return tryLoadTextures(data, true);
   }
 
-  private static boolean tryLoadObjects(MapMetadata data){
+  private static Result<Void, String> tryLoadObjects(MapMetadata data){
     if (data.objectDirectory.isPresent()) {
       try {
         ItemLoader.LoadUserObjects(data.objectDirectory.get());
       } catch (Exception e){
         e.printStackTrace();
-        log.severe("Failed to load user objects");
-        return false;
+        return IOErr.withLog("Failed to load user objects", log);
       }
     }
-    return true;
+    return Ok.unit();
   }
 
 
-  private static Optional<TextureAtlas> tryBuildAtlas(String textureDirPath, boolean unloadPrevious) {
+  private static Result<TextureAtlas, String> tryBuildAtlas(String textureDirPath, boolean unloadPrevious) {
     File textureDir = new File(textureDirPath);
+
     if (!textureDir.exists()) {
-      log.warning(String.format("Failed to build atlas, texture directory (%s) does not exist ", textureDirPath));
-      return Optional.empty();
+      return IOErr.withLog(String.format("Failed to build atlas, texture directory (%s) does not exist ", textureDirPath), log);
     }
 
-    Optional<String> path = UserAtlasBuilder.buildAtlas(textureDir.getAbsolutePath());
-    if (path.isEmpty()) {
-      log.warning("Failed to build atlas, build atlas failed");
-      return Optional.empty();
-    }
+    return UserAtlasBuilder.buildAtlas(textureDir.getAbsolutePath()).flatMap(atlas -> {
+      String atlasPath = atlas.getAbsolutePath();
+      try {
+        if (!unloadPrevious && AssetManager.instance().isLoaded(atlasPath)){
+          return new Ok<>(AssetManager.instance().get(atlasPath));
+        }
 
-    String atlasPath = path.get();
-
-    if (!unloadPrevious && AssetManager.instance().isLoaded(atlasPath)){
-      return Optional.of(AssetManager.instance().get(atlasPath));
-    }
-
-    try {
-
-      if (unloadPrevious && AssetManager.instance().isLoaded(atlasPath)){
-        AssetManager.instance().unload(atlasPath);
+        AssetManager.instance().load(atlasPath, TextureAtlas.class);
+        AssetManager.instance().finishLoadingAsset(atlasPath);
+        TextureAtlas t = AssetManager.instance().get(atlasPath);
+        return new Ok<>(t);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return IOErr.withLog("Failed to build atlas", log);
       }
-
-      AssetManager.instance().load(atlasPath, TextureAtlas.class);
-      AssetManager.instance().finishLoadingAsset(atlasPath);
-      TextureAtlas t = AssetManager.instance().get(atlasPath);
-      return Optional.of(t);
-    } catch (Exception e) {
-      e.printStackTrace();
-      log.warning("Failed to build atlas");
-      return Optional.empty();
-    }
+    });
   }
 
   public static Optional<MapMetadata> get(MapLocation id) {
-      return tryLoadMetaData(id);
+      return tryLoadMetaData(id).ok();
   }
 
-  private static Optional<MapMetadata> tryLoadMetaData(MapLocation locations) {
+  private static Result<MapMetadata, String> tryLoadMetaData(MapLocation locations) {
     File mapDir = new File(locations.mapBasePath);
     if (!mapDir.exists() || !mapDir.isDirectory()) {
-      log.warning(
-          String.format("Failed to load map directory %s, directory does not exist", mapDir.getAbsolutePath()));
-      return Optional.empty();
+      return IOErr.withLog("Failed to load map directory " + mapDir.getAbsolutePath() + ", directory does not exist", log);
     }
 
     File mapContentDir = new File(locations.mapContentPath);
     if (!mapContentDir.exists() || !mapContentDir.isDirectory()) {
-      log.warning(
-          String.format("Failed to load map content directory %s, directory does not exist", mapContentDir.getAbsolutePath()));
-      return Optional.empty();
+      return IOErr.withLog("Failed to load map content directory " + mapDir.getAbsolutePath() + ", directory does not exist", log);
     }
 
     File mapData = null;
@@ -372,14 +363,18 @@ public class MapLoader {
     }
 
     if (mapData == null && !definesGrids) {
-      log.warning(String.format("Map directory (%s) does not contain map json nor a grid directory with grid files", mapContentDir.getAbsolutePath()));
-      return Optional.empty();
+      return IOErr.withLog(
+        String.format("Map directory (%s) does not contain map json nor a grid directory with grid files", mapContentDir.getAbsolutePath()),
+        log
+      );
     }
 
     File metadataFile = new File(locations.mapMetadataPath);
     if (!metadataFile.exists()) {
-      log.warning(String.format("Failed to load map metadata file %s, file does not exist", metadataFile.getAbsolutePath()));
-      return Optional.empty();
+      return IOErr.withLog(
+        String.format("Failed to load map metadata file %s, file does not exist", metadataFile.getAbsolutePath()),
+        log
+      );
     }
 
     MapMetadata metadata = new MapMetadata();
@@ -389,8 +384,10 @@ public class MapLoader {
       json = new JsonReader().parse(fr);
     } catch (Exception e) {
       e.printStackTrace();
-      log.warning(String.format("Exception while reading metadata file (%s)", metadataFile.getAbsolutePath()));
-      return Optional.empty();
+      return IOErr.withLog(
+        String.format("Exception while reading metadata file (%s)", metadataFile.getAbsolutePath()),
+        log
+      );
     }
 
     metadata.read(new Json(), json);
@@ -404,6 +401,6 @@ public class MapLoader {
 
     metadata.locations = locations;
 
-    return Optional.of(metadata);
+    return new Ok<>(metadata);
   }
 }
