@@ -7,7 +7,7 @@ import cs1396.escaperoom.ui.widgets.G24Label;
 
 public class ItemPayload extends DragAndDrop.Payload{
   public ItemPayload(Item i){
-    setDragActor(new G24Label(i.getItemName(), "bubble",0.65f));
+    setDragActor(new G24Label(i.getItemName(), "bubble"));
     setObject(i);
   }
 

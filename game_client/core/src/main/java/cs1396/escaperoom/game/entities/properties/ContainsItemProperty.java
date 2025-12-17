@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 import cs1396.escaperoom.editor.ui.ConfigurationMenu;
+import cs1396.escaperoom.editor.ui.PropertyConfiguration;
 import cs1396.escaperoom.editor.ui.Menu.MenuEntry;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.player.PlayerAction;
@@ -23,6 +24,7 @@ import cs1396.escaperoom.game.world.Grid;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.ItemSelectUI;
 import cs1396.escaperoom.ui.ItemSelectUI.SelectedItem;
+import cs1396.escaperoom.ui.widgets.G24TextInput.StringInput;
 
 public class ContainsItemProperty
     extends ItemProperty<ContainedItem> {
@@ -33,6 +35,8 @@ public class ContainsItemProperty
     "Items with the contains items property can hold items inside them.",
     null
   );
+
+  private String actionVerb = "Open";
 
   @Override 
   public PropertyDescription getDescription(){
@@ -47,7 +51,7 @@ public class ContainsItemProperty
 
     @Override
     public String getActionName() {
-      return "Open";
+      return actionVerb;
     }
 
     @Override
@@ -180,6 +184,7 @@ public class ContainsItemProperty
       json.writeValue(contained.getItem().getID());
     });
     json.writeArrayEnd();
+    json.writeValue("action", actionVerb);
   }
 
   @Override
@@ -198,6 +203,8 @@ public class ContainsItemProperty
       });
     }
 
+    actionVerb = jsonData.getString("action", "Open");
+
     Grid.onMapCompletion.add((g) -> {
       ids.forEach((i) -> {
         this.selectedItem.add(new SelectedItem(g.items.get(i)));
@@ -209,5 +216,20 @@ public class ContainsItemProperty
   @Override
   public Class<ContainedItem> getValueClass() {
     return ContainedItem.class;
+  }
+
+  @Override
+  public Optional<PropertyConfiguration> getCustomItemConfigurationMenu() {
+    PropertyConfiguration config = new PropertyConfiguration();
+
+    config.addStringInput(
+      "Action Label",
+      "Action label to view contained items. Default is \"Open\"",
+      new StringInput(
+        actionVerb,
+        (newVal) -> actionVerb = newVal)
+    );
+
+    return Optional.of(config);
   }
 }

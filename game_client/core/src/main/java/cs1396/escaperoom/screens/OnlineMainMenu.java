@@ -14,7 +14,7 @@ import cs1396.escaperoom.screens.utils.ScreenManager;
 import cs1396.escaperoom.services.User;
 
 public class OnlineMainMenu extends MenuScreen {
-  G24TextButton myMapsButton = new G24TextButton("My Maps");
+  G24TextButton myMapsButton = new G24TextButton("My Maps", "med-text");
   private ChangeListener onMyMaps = new ChangeListener() {
     @Override
     public void changed(ChangeEvent event, Actor actor) {
@@ -30,7 +30,7 @@ public class OnlineMainMenu extends MenuScreen {
     }
   };
 
-  G24TextButton logOutButton = new G24TextButton("Log Out");
+  G24TextButton logOutButton = new G24TextButton("Log Out", "med-text");
   private ChangeListener onLogOut = new ChangeListener() {
     @Override
     public void changed(ChangeEvent event, Actor actor) {
@@ -39,7 +39,7 @@ public class OnlineMainMenu extends MenuScreen {
     }
   };
 
-  G24TextButton marketPlaceButton = new G24TextButton("Marketplace");
+  G24TextButton marketPlaceButton = new G24TextButton("Marketplace", "med-text");
   private ChangeListener onMarketplace = new ChangeListener() {
     @Override
     public void changed(ChangeEvent event, Actor actor) {
@@ -47,7 +47,7 @@ public class OnlineMainMenu extends MenuScreen {
     }
   };
 
-  G24TextButton leaderBoardButton = new G24TextButton("Leaderboard");
+  G24TextButton leaderBoardButton = new G24TextButton("Leaderboard", "med-text");
   private ChangeListener onLeaderboard = new ChangeListener() {
     @Override
     public void changed(ChangeEvent event, Actor actor) {

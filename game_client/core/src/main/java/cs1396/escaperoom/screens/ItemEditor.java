@@ -121,7 +121,7 @@ public class ItemEditor extends AbstractScreen {
     rootTable.defaults().pad(0);
     rootTable.setFillParent(true);
     rootTable.top().left();
-    itemMenu = new Menu(null, "Item Values", null);
+    itemMenu = new Menu(null, "Item Values", null, true);
     itemMenuContainer = new Container<>(itemMenu);
     itemMenuContainer.top().left();
     itemSidebar = new ItemSideBar();

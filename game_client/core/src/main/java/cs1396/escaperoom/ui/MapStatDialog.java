@@ -1,7 +1,5 @@
 package cs1396.escaperoom.ui;
 
-import java.util.Optional;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,6 +20,8 @@ import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.engine.assets.maps.MapManager;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata;
 import cs1396.escaperoom.engine.assets.maps.MapMetadata.MapStats;
+import cs1396.escaperoom.engine.types.Result;
+import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Dialog;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24Label;
@@ -107,10 +107,10 @@ public class MapStatDialog extends G24Dialog {
     desc.space(10);
     desc.columnLeft();
 
-    G24Label titleLabel = new G24Label("Description", "title", 0.65f);
+    G24Label titleLabel = new G24Label("Description", "title");
     desc.addActor(titleLabel);
 
-    G24Label descLabel = new G24Label(stats.description, "default", 0.65f);
+    G24Label descLabel = new G24Label(stats.description, "default");
     descLabel.setWrap(true);
     descLabel.setAlignment(Align.left);
 
@@ -134,15 +134,16 @@ public class MapStatDialog extends G24Dialog {
   @Override
   public Dialog show(Stage stage) {
     Dialog d = super.show(stage);
-    System.out.println(metadata.locations.mapBasePath);
 
-    waitFor(MapManager.fetchThumbnail(metadata), (Optional<String> oPath) -> {
-      oPath.ifPresent((p) -> {
-        MapManager.loadThumbNail(p).ifPresent((i) -> {
-          i.setScaling(Scaling.fit);
-          thumbnailContainer.setActor(i);
-        });
-      });
+    waitFor(MapManager.fetchThumbnail(metadata), (Result<String, String> res) -> {
+      res
+        .inspect(p -> {
+          MapManager.loadThumbNail(p).ifPresent((i) -> {
+            i.setScaling(Scaling.fit);
+            thumbnailContainer.setActor(i);
+          });
+        })
+        .inspect_err(e -> Notifier.error(e));
     });
     return d;
 

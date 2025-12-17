@@ -25,7 +25,8 @@ public class Login extends MenuScreen {
 
   private class CreateAccountButton extends G24TextButton {
     public CreateAccountButton() {
-      super("Create Account");
+      super("Create Account", "med-text");
+
       setProgrammaticChangeEvents(false);
       this.addListener(switchToCreateAccount);
     }
@@ -44,7 +45,7 @@ public class Login extends MenuScreen {
         rootTable.add(new Label("CONFIRM PASSWORD", skin, "bubble"));
         rootTable.add(confirmPasswordField).width(300);
         rootTable.row();
-        rootTable.add(CreateAccountButton.this).colspan(2);
+        rootTable.add(CreateAccountButton.this).colspan(2).minWidth(300);
 
         CreateAccountButton.this.removeListener(switchToCreateAccount);
         CreateAccountButton.this.addListener(tryAccountCreation);
@@ -81,7 +82,7 @@ public class Login extends MenuScreen {
 
   private class LoginButton extends G24TextButton {
     public LoginButton() {
-      super("Login");
+      super("Login", "med-text");
       setProgrammaticChangeEvents(false);
       addListener(tryLoginListener);
     }
@@ -122,21 +123,21 @@ public class Login extends MenuScreen {
 
   @Override
   public void init() {
-    userNameField = new G24TextInput("", skin);
+    userNameField = new G24TextInput("");
     userNameField.setAlphanumeric();
     userNameField.setOnEnter(() -> {
       if (loginButton.getStage() != null) loginButton.tryLogin();
       else createAccountButton.tryCreateAccount();
     });
 
-    passwordField = new G24TextInput("", skin);
+    passwordField = new G24TextInput("");
     passwordField.setPasswordMode(true);
     passwordField.setOnEnter(() -> {
       if (loginButton.getStage() != null) loginButton.tryLogin();
       else createAccountButton.tryCreateAccount();
     });
 
-    confirmPasswordField = new G24TextInput("", skin);
+    confirmPasswordField = new G24TextInput("");
     confirmPasswordField.setPasswordMode(true);
     confirmPasswordField.setOnEnter(() -> {
       if (loginButton.getStage() != null) loginButton.tryLogin();
@@ -172,8 +173,8 @@ public class Login extends MenuScreen {
     rootTable.add(new Label("PASSWORD:", skin, "bubble"));
     rootTable.add(passwordField).width(FIELD_WIDTH);
     rootTable.row();
-    rootTable.add(loginButton).colspan(2);
+    rootTable.add(loginButton).colspan(2).minWidth(300);
     rootTable.row();
-    rootTable.add(createAccountButton).colspan(2);
+    rootTable.add(createAccountButton).colspan(2).minWidth(300);
   }
 }
