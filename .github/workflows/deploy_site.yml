@@ -1,0 +1,56 @@
+name: 'Deploy Site'
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [ "closed" ]
+    paths: [ "game_site/**" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: "us-east-2"
+
+jobs:
+  terraform:
+    if: github.event.pull_request.merged == true
+    name: "Deploy Site"
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell
+    defaults:
+      run:
+        working-directory: "game_site/infrastructure"
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Read and load aws credentials
+    - name: Load Credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Build using the makefile
+    - name: Build Site
+      working-directory: "game_site"
+      run: make site
+
+    # Install the latest version of Terraform CLI and configure
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    # Initialize a new or existing Terraform working directory
+    - name: Terraform Deploy
+      run: |
+        terraform init
+        terraform apply -auto-approve -input=false

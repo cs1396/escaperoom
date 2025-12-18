@@ -1,0 +1,47 @@
+name: 'Plan Site'
+
+on:
+  pull_request:
+    paths: [ "game_site/**" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: "us-east-2"
+
+jobs:
+  terraform:
+    name: "Plan Site"
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        working-directory: "game_site/infrastructure"
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Load Credentials
+      id: creds
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        role-to-assume: arn:aws:iam::442426877818:role/GithubAction-Deployments
+        role-session-name: GitHub_to_AWS_via_FederatedOIDC
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Build Site
+      working-directory: "game_site"
+      run: make site
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Plan Terraform
+      run: |
+        terraform init
+        terraform plan -input=false
