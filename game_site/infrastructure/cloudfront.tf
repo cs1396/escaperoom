@@ -33,14 +33,7 @@ resource "aws_s3_bucket_policy" "policy" {
 
 locals {
   s3_origin_id = "Escaperoom Origin"
-  # my_domain    = "uaqapps.com"
 }
-
-# data "aws_acm_certificate" "uaqapps" {
-#   region   = "us-east-1"
-#   domain   = "*.${local.my_domain}"
-#   statuses = ["ISSUED"]
-# }
 
 resource "aws_cloudfront_origin_access_control" "default" {
   name                              = "default-oac"
@@ -86,21 +79,3 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     ssl_support_method       = "sni-only"
   }
 }
-
-# # Create Route53 records for the CloudFront distribution aliases
-# data "aws_route53_zone" "uaqapps" {
-#   name = local.my_domain
-# }
-
-# resource "aws_route53_record" "cloudfront" {
-#   for_each = aws_cloudfront_distribution.s3_distribution.aliases
-#   zone_id  = data.aws_route53_zone.uaqapps.zone_id
-#   name     = each.value
-#   type     = "A"
-#
-#   alias {
-#     name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-#     zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-#     evaluate_target_health = false
-#   }
-# }
