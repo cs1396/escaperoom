@@ -1,0 +1,43 @@
+name: 'Build Stable'
+
+on:
+  push:
+    tags: [ "**" ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Publish Binaries
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: "game_client"
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build
+      run: | 
+        make dist
+
+        # rename to correct version
+        for FILE in lwjgl3/build/construo/dist/*; do
+          NAME=$(echo "$FILE" | sed 's/##VERSION##/${{ github.ref }}/');
+          mv $FILE $NAME
+        done
+
+        cd lwjgl3/build/construo/dist; sha256sum * > SHA256Sum.txt
+
+    - name: Upload to Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        # repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: lwjgl3/build/construo/dist/*
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true

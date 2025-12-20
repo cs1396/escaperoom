@@ -1,8 +1,8 @@
-name: 'Plan Server'
+name: 'Plan Site'
 
 on:
   pull_request:
-    paths: [ "data_server/**" ]
+    paths: [ "game_site/**" ]
 
 permissions:
   contents: read
@@ -10,27 +10,22 @@ permissions:
 
 env:
   AWS_REGION: "us-east-2"
-  MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
-  MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
 
 jobs:
   terraform:
-    name: "Plan Server"
+    name: "Plan Site"
     runs-on: ubuntu-latest
     environment: production
 
-    # Use the Bash shell
     defaults:
       run:
-        working-directory: "data_server/infrastructure"
+        working-directory: "game_site/infrastructure"
         shell: bash
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v4
 
-    # Read and load aws credentials
     - name: Load Credentials
       id: creds
       uses: aws-actions/configure-aws-credentials@v1.7.0
@@ -39,16 +34,13 @@ jobs:
         role-session-name: GitHub_to_AWS_via_FederatedOIDC
         aws-region: ${{ env.AWS_REGION }}
 
-    # Build using the makefile
-    - name: Build Server
-      working-directory: "data_server"
-      run: make build
+    - name: Build Site
+      working-directory: "game_site"
+      run: make site
 
-    # Install the latest version of Terraform CLI and configure
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
-    # Initialize a new or existing Terraform working directory
     - name: Plan Terraform
       run: |
         terraform init

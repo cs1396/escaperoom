@@ -1,0 +1,48 @@
+name: 'Build Nightly'
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    types: [ "closed" ]
+    paths: [ "game_client/**" ]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-nightly:
+    if: github.event.pull_request.merged == true
+    name: "Build Nightly Release"
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        working-directory: "game_client"
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build JAR && Sum
+        run: |
+          rm -rf lwjgl3/build/libs/*
+          ./gradlew lwjgl3:dist
+          for f in *.jar; do 
+            mv -- "$f" "${f%.*}-nightly.jar";
+          done
+          cd lwjgl3/build/libs; sha256sum *.jar > SHA256Sum.txt
+
+      - name: Update Nightly Release
+        uses: andelf/nightly-release@main
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Nightly Universal JAR'
+          prerelease: true
+          body: 'Universal jar nightly build. Not guaranteed to be stable or even fully functional, though is updated with each PR.\nIs run with java -jar [name]'
+          files: |
+            ./lwjgl3/build/libs/*

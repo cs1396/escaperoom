@@ -119,18 +119,23 @@ tasks.register("jarWin") {
 }
 
 construo {
-    // name of the executable
-    name.set(appName)
+    // name of the executable, plus a templating string
+    name.set("${appName}-##VERSION##")
     // human-readable name, used for example in the `.app` name for macOS
     humanName.set(appName)
 
     targets.configure {
+      register("linuxAarch64", Target.Linux) {
+        architecture.set(Target.Architecture.AARCH64)
+        jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_linux_hotspot_17.0.15_6.tar.gz")
+        // Linux does not currently have a way to set the icon on the executable
+      }
       register("linuxX64", Target.Linux) {
         architecture.set(Target.Architecture.X86_64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
       }
-      register("macM1", Target.MacOs) {
+      register("macAarch64", Target.MacOs) {
         architecture.set(Target.Architecture.AARCH64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
@@ -155,6 +160,42 @@ construo {
         //useConsole.set(true)
       }
     }
+}
+
+// run all package tasks
+tasks.register('LinuxAarch64Jdk') {
+  dependsOn 'downloadJdkLinuxAarch64'
+  dependsOn 'unzipJdkLinuxAarch64'
+}
+tasks.register('LinuxX64Jdk') {
+  dependsOn 'downloadJdkLinuxX64'
+  dependsOn 'unzipJdkLinuxX64'
+}
+tasks.register('MacAarch64Jdk') {
+  dependsOn 'downloadJdkMacAarch64'
+  dependsOn 'unzipJdkMacAarch64'
+}
+tasks.register('MacX64Jdk') {
+  dependsOn 'downloadJdkMacX64'
+  dependsOn 'unzipJdkMacX64'
+}
+tasks.register('WinX64Jdk') {
+  dependsOn 'downloadJdkWinX64'
+  dependsOn 'unzipJdkWinX64'
+}
+tasks.register('LoadJDKs') {
+  dependsOn 'LinuxAarch64Jdk'
+  dependsOn 'LinuxX64Jdk'
+  dependsOn 'MacAarch64Jdk'
+  dependsOn 'MacX64Jdk'
+  dependsOn 'WinX64Jdk'
+}
+tasks.register('FullBuild') {
+  dependsOn 'packageLinuxAarch64'
+  dependsOn 'packageLinuxX64'
+  dependsOn 'packageMacAarch64'
+  dependsOn 'packageMacX64'
+  dependsOn 'packageWinX64'
 }
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
