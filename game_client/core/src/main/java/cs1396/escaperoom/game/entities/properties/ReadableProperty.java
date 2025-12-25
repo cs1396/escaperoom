@@ -130,10 +130,10 @@ public class ReadableProperty extends ItemProperty<ReadableContents> {
     col.space(10);
     col.align(Align.center);
 
-    col.addActor(new G24Label("Action Name:", "underline", 0.65f));
+    col.addActor(new G24Label("Action Name:", "underline"));
     col.addActor(actionField);
 
-    col.addActor(new G24Label("Contents:", "underline", 0.65f));
+    col.addActor(new G24Label("Contents:", "underline"));
     col.addActor(contentField);
 
     return new ConfigurationMenu<>(parent, new SimpleUI(col), getDisplayName(), screen);

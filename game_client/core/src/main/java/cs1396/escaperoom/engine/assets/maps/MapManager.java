@@ -13,6 +13,9 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.engine.assets.utils.FileUtils;
+import cs1396.escaperoom.engine.types.Result;
+import cs1396.escaperoom.engine.types.Result.Err;
+import cs1396.escaperoom.engine.types.Result.Ok;
 import cs1396.escaperoom.services.Networking;
 import cs1396.escaperoom.services.Networking.StatusCode;
 
@@ -37,34 +40,35 @@ public class MapManager {
    *
    * We can't load the image on a non OpenGL thread
    */
-  public static CompletableFuture<Optional<String>> fetchThumbnail(MapMetadata metadata) {
-    if (metadata.locations.isDownloaded) {
-      return CompletableFuture.supplyAsync(() -> Optional.of(metadata.locations.mapThumbnailPath));
+  public static CompletableFuture<Result<String, String>> fetchThumbnail(MapMetadata metadata) {
+    if (new File(metadata.locations.mapThumbnailPath).exists()) {
+      return CompletableFuture.completedFuture(new Ok<>(metadata.locations.mapThumbnailPath));
     }
 
     String dataDir = FileUtils.getAppDataDir();
     File tempDir = new File(dataDir + "/cache");
     if (!tempDir.exists()) {
       if (!tempDir.mkdir()) {
-        return CompletableFuture.supplyAsync(() -> Optional.empty());
+        return CompletableFuture.completedFuture(new Err<>("Failed to create directory"));
       }
     }
 
     File thumbnailFile = new File(dataDir + "/cache/" + metadata.mapID + "thumbnail.png");
     if (thumbnailFile.exists()) {
-      return CompletableFuture.supplyAsync(() -> Optional.of(thumbnailFile.getAbsolutePath()));
+      return CompletableFuture.completedFuture(new Ok<>(thumbnailFile.getAbsolutePath()));
     }
 
-    return Networking.downloadMapThumbnail(metadata.mapID, tempDir.getAbsolutePath()).thenApply((StatusCode s) -> {
-      if (s == StatusCode.OK) {
-        File tempThumbnailFile = new File(tempDir, "thumbnail.png");
-        if (!tempThumbnailFile.exists()) {
-          return Optional.empty();
+    return Networking.downloadMapThumbnail(metadata.mapID, tempDir.getAbsolutePath())
+      .thenApply((StatusCode s) -> {
+        if (s == StatusCode.OK) {
+          File tempThumbnailFile = new File(tempDir, "thumbnail.png");
+          if (!tempThumbnailFile.exists()) {
+            return new Err<>("Failed to download thumbnail");
+          }
+          tempThumbnailFile.renameTo(thumbnailFile);
+          return new Ok<>(thumbnailFile.getAbsolutePath());
         }
-        tempThumbnailFile.renameTo(thumbnailFile);
-        return Optional.of(thumbnailFile.getAbsolutePath());
-      }
-      return Optional.empty();
+        return new Err<>("Failed to download thumbnail: Status code " + s.toString());
     });
 
   }

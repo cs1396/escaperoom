@@ -52,7 +52,7 @@ public class ItemSlot extends Container<cs1396.escaperoom.ui.ItemSlot.ItemSlotIn
     protected void setItem(Item item){
       ItemSlotValues iv = new ItemSlotValues(item);
       this.add(iv.itemPreview);
-      new Tooltip.Builder(new G24Label(item.getItemName() + " ID " + item.getID(), "bubble_gray", 0.65f)).target(iv.itemPreview, Tooltip.stageHelper(this)).build();
+      new Tooltip.Builder(new G24Label(item.getItemName() + " ID " + item.getID(), "bubble_gray")).target(iv.itemPreview, Tooltip.stageHelper(this)).build();
       this.slotValues = Optional.of(iv);
     }
 

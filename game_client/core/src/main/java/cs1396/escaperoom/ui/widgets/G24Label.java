@@ -17,6 +17,5 @@ public class G24Label extends Label {
   public G24Label(String content, String style, float scale){
     super(content, AbstractScreen.skin);
     setStyle(AbstractScreen.skin.get(style, LabelStyle.class));
-    setFontScale(scale);
   }
 }

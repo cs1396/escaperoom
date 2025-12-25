@@ -1,6 +1,5 @@
 package cs1396.escaperoom.editor.item.ui;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +36,7 @@ public class PropertyWorkspace extends ScrollPane {
     }
 
     public PropertyPill(P property) {
-      super(property.getDescription().name, "bubble", 0.65f);
+      super(property.getDescription().name, "bubble");
       addListener(CursorManager.hoverHelper(CursorType.Hand));
       this.property = property;
 
@@ -46,16 +45,16 @@ public class PropertyWorkspace extends ScrollPane {
         public Payload dragStart(InputEvent event, float x, float y, int pointer) {
           Payload pl = new Payload();
           pl.setObject(property.getType());
-          G24Label l = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label l = new G24Label(property.getDescription().name, "bubble");
           l.pack();
           pl.setDragActor(l);
 
-          G24Label il = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label il = new G24Label(property.getDescription().name, "bubble");
           il.setColor(1, 0, 0, 1);
           il.pack();
           pl.setInvalidDragActor(il);
 
-          G24Label vl = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label vl = new G24Label(property.getDescription().name, "bubble");
           vl.setColor(0, 1, 0, 1);
           vl.pack();
           pl.setValidDragActor(vl);
@@ -83,9 +82,7 @@ public class PropertyWorkspace extends ScrollPane {
 
   private void addPill(ItemProperty<?> property){
       PropertyPill<?,?> pill = new PropertyPill<>(property);
-      // YogaNode node = table.add(pill).setPadding(YogaEdge.ALL, 10);
-
-      // nodes.put(property.getType(), node);
+      table.add(pill);
       pills.add(pill);
       table.pack();
       ItemEditor.get().repack();
@@ -96,13 +93,8 @@ public class PropertyWorkspace extends ScrollPane {
   }
 
   public void populateFor(Item item){
-    // TODO:
-    // for (PropertyType type : nodes.keySet()){
-      // table.remove(nodes.get(type));
-    // }
     table.clear();
     table.pack();
-
 
     ItemEditor.get().repack();
 

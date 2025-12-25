@@ -198,6 +198,12 @@ public class Tooltip extends Table {
       return this;
     }
 
+    public Builder target(Actor target) {
+      this.target = target;
+      this.uiStage = Tooltip.stageHelper(target);
+      return this;
+    }
+
     public Tooltip build() {
       return new Tooltip(this);
     }

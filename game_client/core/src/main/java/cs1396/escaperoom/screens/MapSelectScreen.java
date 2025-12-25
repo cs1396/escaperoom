@@ -33,6 +33,7 @@ import cs1396.escaperoom.services.Networking.UploadResponse;
 import cs1396.escaperoom.services.User;
 import cs1396.escaperoom.ui.ConfirmDialog;
 import cs1396.escaperoom.ui.MapStatDialog;
+import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.notifications.NotificationBus;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Dialog;
@@ -128,6 +129,7 @@ public class MapSelectScreen extends MenuScreen {
     private class PlayButton extends ImageButton {
       PlayButton() {
         super(skin, "play");
+        new Tooltip.Builder("Play").target(this).build();
         addListener(new ChangeListener() {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
@@ -146,6 +148,7 @@ public class MapSelectScreen extends MenuScreen {
     private class CopyButton extends ImageButton {
       CopyButton() {
         super(skin, "copy");
+        new Tooltip.Builder("Copy Map").target(this).build();
         setProgrammaticChangeEvents(false);
         addListener(new ChangeListener() {
           @Override
@@ -193,6 +196,7 @@ public class MapSelectScreen extends MenuScreen {
     private class DeleteButton extends ImageButton {
       DeleteButton() {
         super(skin, "toggleForbidden");
+        new Tooltip.Builder("Delete Map").target(this).build();
         setProgrammaticChangeEvents(false);
         addListener(new ChangeListener() {
           @Override
@@ -250,6 +254,7 @@ public class MapSelectScreen extends MenuScreen {
     private class DownloadButton extends ImageButton {
       DownloadButton() {
         super(skin, "download");
+        new Tooltip.Builder("Download Map").target(this).build();
         if (new File(data.locations.mapBasePath).exists()) {
           setDisabled(true);
           return;
@@ -281,6 +286,7 @@ public class MapSelectScreen extends MenuScreen {
     private class InfoButton extends ImageButton {
       InfoButton(MapStats stats) {
         super(skin, "info");
+        new Tooltip.Builder("Map Information").target(this).build();
         setProgrammaticChangeEvents(false);
         addListener(new ChangeListener() {
           @Override
@@ -297,6 +303,7 @@ public class MapSelectScreen extends MenuScreen {
     private class EditButton extends ImageButton {
       EditButton() {
         super(skin, "edit");
+        new Tooltip.Builder("Edit Map").target(this).build();
         addListener(new ChangeListener() {
           @Override
           public void changed(ChangeEvent event, Actor actor) {
@@ -315,6 +322,7 @@ public class MapSelectScreen extends MenuScreen {
     private class VerifyButton extends G24TextButton {
       VerifyButton() {
         super("Verify");
+        new Tooltip.Builder("Verify map to upload").target(this).build();
         pack();
         addListener(new ChangeListener() {
           @Override
@@ -353,7 +361,7 @@ public class MapSelectScreen extends MenuScreen {
   protected void init(Array<MapMetadata> maps, MapSelectScreenSettings settings, AbstractScreen returnTo) {
     this.settings = settings;
     this.returnTo = returnTo;
-    backButton = new G24TextButton("Back");
+    backButton = new G24TextButton("Back", "med-text");
     backButton.addListener(onBackButton);
 
     rootTable.defaults().pad(10);
@@ -545,7 +553,7 @@ public class MapSelectScreen extends MenuScreen {
 
 
     CreateNewMapButton() {
-      super("Create New Map");
+      super("Create New Map", "med-text");
       setProgrammaticChangeEvents(false);
 
       addListener(new ChangeListener() {

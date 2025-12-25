@@ -53,7 +53,7 @@ public class DrawingUI extends Table implements HandlesMenuClose {
         }
       });
 
-      label = new G24Label(item.getItemName(), "default", 0.65f);
+      label = new G24Label(item.getItemName(), "default");
       slot = new ItemSlot(item);
     }
 
@@ -104,7 +104,7 @@ public class DrawingUI extends Table implements HandlesMenuClose {
     btnGroup.add(new ColorButton(Color.BLUE));
     btnGroup.add(new ColorButton(Color.BLACK));
 
-    G24Label label = new G24Label("Brush Size:", "bubble", 0.65f);
+    G24Label label = new G24Label("Brush Size:", "bubble");
     G24NumberInput numberInput = new G24NumberInput();
     numberInput.setText(Integer.toString(DrawingPane.getBrushSize()));
     numberInput.setMaxLength(2);
@@ -211,7 +211,7 @@ public class DrawingUI extends Table implements HandlesMenuClose {
     add(label).left();
     add(numberInput).left().maxWidth(60);
     row();
-    add(new G24Label("Shape:", "bubble", 0.65f)).left();
+    add(new G24Label("Shape:", "bubble")).left();
     add(brushShapes).left();
     row();
     add(new G24Label("Item Brush", "title")).center().colspan(2);
