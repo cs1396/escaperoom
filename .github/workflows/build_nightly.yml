@@ -30,7 +30,7 @@ jobs:
         run: |
           rm -rf lwjgl3/build/libs/*
           ./gradlew lwjgl3:dist
-          for f in *.jar; do 
+          for f in lwjgl3/build/libs/*.jar; do
             mv -- "$f" "${f%.*}-nightly.jar";
           done
           cd lwjgl3/build/libs; sha256sum *.jar > SHA256Sum.txt
