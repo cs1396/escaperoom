@@ -21,7 +21,7 @@ resource "aws_s3_object" "add_files" {
 
 action "aws_cloudfront_create_invalidation" "invalidation" {
   config {
-    distribution_id = aws_cloudfront_distribution.example.id
+    distribution_id = aws_cloudfront_distribution.s3_distribution.id
     paths           = [ for name, file in module.template_files.files : name ]
   }
 }
