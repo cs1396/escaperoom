@@ -42,7 +42,7 @@ resource "aws_s3_object" "add_files" {
 
 locals {
   # files changed or added
-  changes = compact([ for name, file in resource.aws_s3_object.add_files : lookup(local.remote_tags, name, "") != file.etag ? name : null])
+  changes = compact([ for name, file in resource.aws_s3_object.add_files : lookup(local.remote_tags, name, "") != file.etag ? "/${name}" : null])
 }
 
 action "aws_cloudfront_create_invalidation" "invalidation" {
