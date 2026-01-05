@@ -20,3 +20,4 @@
 - [ ] copying a map does not copy game settings; probably move from metadata to mapdata
 - [ ] switching tools doesnt always properly clear the previous tool (?)
 - [ ] game settings dialog requires two escape presses
+
