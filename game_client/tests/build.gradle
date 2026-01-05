@@ -1,0 +1,31 @@
+apply plugin: "java"
+java.sourceCompatibility = 17
+
+tasks.test {
+  useJUnitPlatform()
+}
+
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+
+dependencies {
+  implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+  implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  implementation project(':core')
+  implementation("com.badlogicgames.gdx:gdx-tools:$gdxVersion"){exclude group: 'com.badlogicgames.gdx', module: 'gdx-backend-lwjgl'}
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+      implementation "io.github.berstanio:gdx-svmhelper-extension-freetype:$graalHelperVersion"
+
+    }
+}
+
+sourceSets {
+	test {
+      java {
+        srcDir 'src'
+      }
+    }
+}

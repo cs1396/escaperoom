@@ -13,6 +13,7 @@ gradle-app.setting
 /headless/build/
 /server/build/
 /shared/build/
+/tests/build
 
 ## Java:
 *.class
@@ -77,6 +78,7 @@ www-test/
 /headless/bin/
 /server/bin/
 /shared/bin/
+/tests/bin/
 *.tmp
 *.bak
 *.swp
