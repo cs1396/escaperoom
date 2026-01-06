@@ -38,6 +38,7 @@ import cs1396.escaperoom.ui.notifications.NotificationBus;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Dialog;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.IntInput;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24TextInput;
@@ -87,7 +88,7 @@ public class MapSelectScreen extends MenuScreen {
       this.data = metadata;
       innerTable.setFillParent(true);
       innerTable.defaults().pad(10).center();
-      innerTable.add(new G24Label(metadata.name, "bubble"));
+      innerTable.add(new G24Label(metadata.name, G24LabelStyle.Bubble));
 
       if (settings.play) {
         innerTable.add(new PlayButton());
@@ -159,7 +160,7 @@ public class MapSelectScreen extends MenuScreen {
               G24TextInput nameInput = new G24TextInput();
 
               new ConfirmDialog.Builder("Copy Map")
-                .withContent(new G24Label("Copy Name:", "underline"))
+                .withContent(new G24Label("Copy Name:", G24LabelStyle.Underline))
                 .withContent(nameInput)
                 .confirmText("Copy")
                 .onConfirm(() -> {
@@ -208,7 +209,7 @@ public class MapSelectScreen extends MenuScreen {
                 .withContent(new Content(new G24Label(
                   "This will delete any custom object data or textures in this directory"), true, Align.center))
                 .withContent(new Content(new G24Label(
-                  "This cannot be undone", "underline"), true, Align.center))
+                  "This cannot be undone", G24LabelStyle.Underline), true, Align.center))
                 .confirmText("Delete")
                 .onConfirm(() -> {
                   MapSaver.deleteMap(MapEntry.this.data);
@@ -491,7 +492,7 @@ public class MapSelectScreen extends MenuScreen {
 
   private class CreateNewMapButton extends G24TextButton {
     private G24Dialog getConfirmDialog(){
-      G24Label nameLabel = new G24Label("Map Name", "underline");
+      G24Label nameLabel = new G24Label("Map Name", G24LabelStyle.Underline);
       G24TextInput mapNameInput = new G24TextInput();
       mapNameInput.setFilter(
           (c) -> Character.isAlphabetic(c) ||
@@ -544,9 +545,9 @@ public class MapSelectScreen extends MenuScreen {
 
       d.getContentTable().add(nameLabel).colspan(2).row();
       d.getContentTable().add(mapNameInput).colspan(2).row();
-      d.getContentTable().add(new G24Label("Map Height","underline"));
+      d.getContentTable().add(new G24Label("Map Height", G24LabelStyle.Underline));
       d.getContentTable().add(heightInput).row();
-      d.getContentTable().add(new G24Label("Map Width", "underline"));
+      d.getContentTable().add(new G24Label("Map Width", G24LabelStyle.Underline));
       d.getContentTable().add(widthInput).row();
       return d;
     }

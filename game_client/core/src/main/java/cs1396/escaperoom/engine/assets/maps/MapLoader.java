@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonReader;
 
 import cs1396.escaperoom.engine.assets.AssetManager;
+import cs1396.escaperoom.engine.assets.AssetManager.UserAtlas;
 import cs1396.escaperoom.engine.assets.UserAtlasBuilder;
 import cs1396.escaperoom.engine.assets.items.ItemLoader;
 import cs1396.escaperoom.engine.assets.items.ItemLoader.LoadedObjects;
@@ -206,7 +207,6 @@ public class MapLoader {
    */
   public static Result<MapData, MapLoadErr> tryLoadMap(MapMetadata metadata, boolean create){
     LoadedObjects.clearUserItems();
-    AssetManager.instance().invalidateTextureCache();
     File legacyMapPath = new File(metadata.locations.mapMainFilePath);
 
     return tryLoadTextures(metadata)
@@ -269,12 +269,17 @@ public class MapLoader {
 
   private static Result<Void, String> tryLoadTextures(MapMetadata data, boolean reload){
     if (data.textureDirectory.isPresent()) {
+      log.info("Texture directory is present at (" + data.textureDirectory.get() + ") -> building atlas");
       return tryBuildAtlas(data.textureDirectory.get(), reload).match(
         atlas -> {
+          log.info("Successfully built atlas -> registering");
           AssetManager.instance().registerUserAtlas(atlas);
           return Ok.unit();
         }, 
-        e -> new Err<>(e)
+        e -> {
+          log.info("Error building atlas: "  + e);
+          return new Err<>(e);
+        }
       );
     }
     return Ok.unit();
@@ -297,7 +302,7 @@ public class MapLoader {
   }
 
 
-  private static Result<TextureAtlas, String> tryBuildAtlas(String textureDirPath, boolean unloadPrevious) {
+  private static Result<UserAtlas, String> tryBuildAtlas(String textureDirPath, boolean reload) {
     File textureDir = new File(textureDirPath);
 
     if (!textureDir.exists()) {
@@ -307,14 +312,14 @@ public class MapLoader {
     return UserAtlasBuilder.buildAtlas(textureDir.getAbsolutePath()).flatMap(atlas -> {
       String atlasPath = atlas.getAbsolutePath();
       try {
-        if (!unloadPrevious && AssetManager.instance().isLoaded(atlasPath)){
+        if (!reload && AssetManager.instance().isLoaded(atlasPath)){
           return new Ok<>(AssetManager.instance().get(atlasPath));
         }
 
         AssetManager.instance().load(atlasPath, TextureAtlas.class);
         AssetManager.instance().finishLoadingAsset(atlasPath);
         TextureAtlas t = AssetManager.instance().get(atlasPath);
-        return new Ok<>(t);
+        return new Ok<>(new UserAtlas(t, atlasPath));
       } catch (Exception e) {
         e.printStackTrace();
         return IOErr.withLog("Failed to build atlas", log);

@@ -21,6 +21,7 @@ import cs1396.escaperoom.game.ui.GameDialog;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.SimpleUI;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24TextInput;
 
 public class ReadableProperty extends ItemProperty<ReadableContents> {
@@ -130,10 +131,10 @@ public class ReadableProperty extends ItemProperty<ReadableContents> {
     col.space(10);
     col.align(Align.center);
 
-    col.addActor(new G24Label("Action Name:", "underline"));
+    col.addActor(new G24Label("Action Name:", G24LabelStyle.Underline));
     col.addActor(actionField);
 
-    col.addActor(new G24Label("Contents:", "underline"));
+    col.addActor(new G24Label("Contents:", G24LabelStyle.Underline));
     col.addActor(contentField);
 
     return new ConfigurationMenu<>(parent, new SimpleUI(col), getDisplayName(), screen);

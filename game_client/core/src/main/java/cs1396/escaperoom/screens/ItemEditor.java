@@ -27,9 +27,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Null;
 
 import cs1396.escaperoom.editor.item.ui.ItemSideBar;
-import cs1396.escaperoom.editor.item.ui.PropertyBank;
-import cs1396.escaperoom.editor.item.ui.PropertyConfigurationMenu;
-import cs1396.escaperoom.editor.item.ui.PropertyWorkspace;
 import cs1396.escaperoom.editor.ui.Menu;
 import cs1396.escaperoom.engine.BackManager;
 import cs1396.escaperoom.engine.assets.AssetManager;
@@ -53,29 +50,32 @@ import cs1396.escaperoom.ui.notifications.Notifier;
 
 public class ItemEditor extends AbstractScreen {
   private Image room;
+  private TextureRegion roomTexture;
+  private Texture tile;
   protected final Batch batch;
-  private Item newItem;
+  private Item item;
   private Item originalItem;
   private MapData mapData;
   private boolean dirty = false;
   private CamMan cameraManager;
   private Texture background;
-  private int ROOM_W = 9,
-              ROOM_H = 9; 
-  private static final int BANK_HEIGHT = 300,
-                          BAR_WIDTH = 250;
+  private int ROOM_DIM = 9;
+  private static final int BAR_WIDTH = 250;
   private Table rootTable;
   private DragAndDrop dragAndDrop;
   public Menu itemMenu;
   public ItemSideBar itemSidebar;
-  static PropertyBank bank;
   static Container<Menu> itemMenuContainer;
   public static ItemEditor screen;
   private boolean modifyingItem;
-  private PropertyConfigurationMenu configurationMenu;
+  private Menu openMenu;
 
-  public Item getNewItem(){
-    return newItem;
+  public void setOpenMenu(Menu m){
+    this.openMenu = m;
+  }
+
+  public Item getItem(){
+    return item;
   }
 
   public DragAndDrop getDragAndDrop(){
@@ -111,21 +111,24 @@ public class ItemEditor extends AbstractScreen {
 
       originalItem = target;
       originalItem.remove(true);
-      newItem = originalItem.clone(true);
+      item = originalItem.clone(true);
     };
 
     fillPropertyParams();
     addRoom();
     registerBinds();
+    cameraManager.setZoom(0.6f);
 
     rootTable.defaults().pad(0);
     rootTable.setFillParent(true);
     rootTable.top().left();
-    itemMenu = new Menu(null, "Item Values", null, true);
+    itemMenu = new Menu(null, "", this, true);
+    itemMenu.clear();
+    itemMenu.padTop(20);
+
     itemMenuContainer = new Container<>(itemMenu);
     itemMenuContainer.top().left();
-    itemSidebar = new ItemSideBar();
-    itemMenu.add(itemSidebar).top().padRight(20).padLeft(10).growY().minWidth(BAR_WIDTH);
+    itemSidebar = new ItemSideBar(itemMenu);
     itemMenu.setMovable(false);
 
     AssetManager.instance().load("textures/menu_hover.png", Texture.class);
@@ -134,15 +137,13 @@ public class ItemEditor extends AbstractScreen {
     TextureRegionDrawable hoverBackground = new TextureRegionDrawable(new TextureRegion(bkg));
 
     itemMenuContainer.setBackground(hoverBackground);
+    itemMenuContainer.minWidth(BAR_WIDTH);
     rootTable.add(itemMenuContainer).top().left().growY();
 
-    bank = new PropertyBank();
-
-    rootTable.add(bank).maxHeight(BANK_HEIGHT).bottom().left().growX().growY();
-
-    itemSidebar.populateFor(newItem);
+    itemSidebar.populateFor(item);
 
     addUI(rootTable);
+
 
     BackManager.setOnEmpty(() -> {
       if (modifyingItem){
@@ -172,21 +173,6 @@ public class ItemEditor extends AbstractScreen {
     });
 	}
 
-
-  /**
-   * Utility function to determine if a ui click hits a pill
-   */
-  PropertyWorkspace.PropertyPill<?,?> hitsPill(Vector2 uiCoords){
-    for (PropertyWorkspace.PropertyPill<?,?> a : itemSidebar.workspace.getPills()){
-      Vector2 origin = a.localToStageCoordinates(new Vector2(0,0));
-      Rectangle bounds = new Rectangle(origin.x, origin.y, a.getWidth(), a.getHeight());
-
-      if (!bounds.contains(uiCoords)) continue;
-
-      return a;
-    }
-    return null;
-  }
 
   public boolean mouseCollidesMenu(){
     float x = Gdx.input.getX();
@@ -225,34 +211,14 @@ public class ItemEditor extends AbstractScreen {
       @Override
       public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
         if (!mouseCollidesMenu() &&
-             configurationMenu != null){
-          configurationMenu.close();
-          configurationMenu = null;
+          openMenu != null){
+          openMenu.close();
+          openMenu = null;
           return true;
         }
         return false;
       }
 
-    });
-
-
-    ControlsManager.registerInput(Input.CONTEXT, InputType.PRESSED, ()->{
-      Vector2 screenCoords = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-      Vector2 uiCoords = getUIStage().screenToStageCoordinates(screenCoords);
-
-      PropertyWorkspace.PropertyPill<?,?> pill;
-      if ((pill = hitsPill(uiCoords)) == null) return;
-
-      configurationMenu = new PropertyConfigurationMenu(pill.getProperty());
-      configurationMenu.setPosition(uiCoords.x, uiCoords.y);
-      addUI(configurationMenu);
-      BackManager.addBack(() -> {
-        if (configurationMenu == null || configurationMenu.getStage() == null) return false;
-
-        configurationMenu.close();
-        configurationMenu = null;
-        return true;
-      });
     });
 
     ControlsManager.registerInput(Input.ZOOM_OUT, InputType.HELD, () -> cameraManager.zoomOut());
@@ -269,7 +235,6 @@ public class ItemEditor extends AbstractScreen {
   public void repack(){
     itemMenu.pack();
     itemMenuContainer.pack();
-    bank.layout();
     rootTable.pack();
   }
 
@@ -278,20 +243,22 @@ public class ItemEditor extends AbstractScreen {
    */
   private void initEmptyItem(){
     ItemTypeData blank = new ItemTypeData("Blank", "None", new Size(1, 1), "placeholder", 0, new HashMap<>());
-    newItem = new Item(blank);
+    item = new Item(blank);
   }
 
   private void addRoom(){
     // Add gridded room
     AssetManager.instance().load("textures/tile.png", Texture.class);
     AssetManager.instance().finishLoading();
-    Texture tile = AssetManager.instance().get("textures/tile.png", Texture.class);
+    tile = AssetManager.instance().get("textures/tile.png", Texture.class);
     tile.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-    TextureRegion roomTexture = new TextureRegion(tile);
-    roomTexture.setRegion(0, 0, tile.getWidth() * ROOM_W, tile.getHeight() * ROOM_H);
+
+
+    roomTexture = new TextureRegion(tile);
+    roomTexture.setRegion(0, 0, tile.getWidth() * ROOM_DIM, tile.getHeight() * ROOM_DIM);
 
     room = new Image(roomTexture);
-    room.setSize(ROOM_W, ROOM_H);
+    room.setSize(ROOM_DIM, ROOM_DIM);
     room.setName("room");
     if (room.getStage() == null){
       addActor(room);
@@ -307,14 +274,14 @@ public class ItemEditor extends AbstractScreen {
   public void resetItem(){
     // reinitialize item to original so we can remove it from the grid
     if (modifyingItem){
-      newItem = originalItem.clone(true);
+      item = originalItem.clone(true);
       fillPropertyParams();
     } else {
       initEmptyItem();
     }
 
-    itemSidebar.populateFor(newItem);
-    updateItemPosition();
+    itemSidebar.populateFor(item);
+    updateRoom();
   }
 
   public MapData getMapData(){
@@ -326,7 +293,7 @@ public class ItemEditor extends AbstractScreen {
 
     // For each of the new items properties, see if the old item had defined
     // values. If so, move that value in this new item.
-    newItem.getProperties().forEach((newProp) -> {
+    item.getProperties().forEach((newProp) -> {
       originalItem.getProperty(newProp.getType()).ifPresent((oldProp)->{
         ItemPropertyValue val = oldProp.getCurrentValue();
         if (val != null){
@@ -355,13 +322,13 @@ public class ItemEditor extends AbstractScreen {
     if (modifyingItem){
 
       // Set the new item position
-      newItem.setPosition(originalItem.position.x, originalItem.position.y);
+      item.setPosition(originalItem.position.x, originalItem.position.y);
 
       transferProperties();
 
       // place our modified item
-      if (MapScreen.canPlace(newItem, newItem.position, mapData.getStartGrid())){
-        mapData.getStartGrid().placeItem(newItem);
+      if (MapScreen.canPlace(item, item.position, mapData.getStartGrid())){
+        mapData.getStartGrid().placeItem(item);
       } else {
         Notifier.error("Modified item no longer has a valid placement on the grid.");
         updateItemPosition();
@@ -379,25 +346,28 @@ public class ItemEditor extends AbstractScreen {
   }
 
   /**
-   * Update the position of the room on resize events
+   * Update the position of the room on resize events 
+   * and item size change events
    */
-  private void updateRoom(){
-    // Everything in screen coords
-    float SCREEN_W = Gdx.graphics.getWidth();
-    float SCREEN_H = Gdx.graphics.getHeight();
+  public void updateRoom(){
 
-    Vector2 viewOrigin = getUIStage().stageToScreenCoordinates(new Vector2(BAR_WIDTH, BANK_HEIGHT));
-    Vector2 viewSize = new Vector2(SCREEN_W, SCREEN_H).sub(viewOrigin);
+    int w = item.getWidth() + 2;
+    int h = item.getHeight() + 2;
 
-    Vector2 roomSize = stageToScreenCoordinates(new Vector2(ROOM_W, ROOM_H));
+    ROOM_DIM = Math.max(w, h);
 
-    Vector2 roomOrigin = viewOrigin.add(viewSize.x / 2, viewSize.y / 2).sub(roomSize.x / 2, roomSize.y / 2);
+    roomTexture.setRegion(0, 0, tile.getWidth() * ROOM_DIM, tile.getHeight() * ROOM_DIM);
 
-    Vector2 gameCoordRoomOrigin = screenToStageCoordinates(roomOrigin);
+    room.setSize(ROOM_DIM, ROOM_DIM);
+    room.setName("room");
+    if (room.getStage() == null){
+      addActor(room);
+    }
 
-    room.setPosition((int)gameCoordRoomOrigin.x, (int)gameCoordRoomOrigin.y);
-    cameraManager.setPosition(gameCoordRoomOrigin.x, gameCoordRoomOrigin.y);
+    room.setPosition(0, 0);
     updateItemPosition();
+
+    cameraManager.setPosition(item.getCenterX(), item.getCenterY());
   }
 
   /**
@@ -406,7 +376,7 @@ public class ItemEditor extends AbstractScreen {
    * This should be called anytime the item's size is changed
    */
   public void updateItemPosition(){
-    newItem.setPosition((int)room.getX() + ROOM_W / 2 - newItem.getWidth() / 2, (int)room.getY() + ROOM_H / 2 - newItem.getHeight() / 2);
+    item.setPosition(ROOM_DIM / 2 - item.getWidth() / 2, ROOM_DIM / 2 - item.getHeight() / 2);
   }
 
 
@@ -417,12 +387,12 @@ public class ItemEditor extends AbstractScreen {
   public void fillPropertyParams(){
     HashMap<PropertyType, JsonValue> propertyParams = new HashMap<>();
 
-    newItem.getProperties().forEach((prop) -> {
+    item.getProperties().forEach((prop) -> {
       JsonValue val = new JsonReader().parse(new Json().toJson(prop));
       propertyParams.put(prop.getType(), val);
     });
 
-    newItem.getType().propertyParameters = propertyParams;
+    item.getType().propertyParameters = propertyParams;
   }
 
   public boolean modifyingItem(){
@@ -435,10 +405,10 @@ public class ItemEditor extends AbstractScreen {
   public void saveItem(){
     fillPropertyParams();
 
-    if (!ItemSaver.saveCustomItem(newItem, mapData.getMetadata())){
-      Notifier.error("Failed to save " + newItem.getItemName());
+    if (!ItemSaver.saveCustomItem(item, mapData.getMetadata())){
+      Notifier.error("Failed to save " + item.getItemName());
     } else {
-      Notifier.info("Saved item " + newItem.getItemName());
+      Notifier.info("Saved item " + item.getItemName());
       dirty = false;
     }
 
@@ -454,14 +424,14 @@ public class ItemEditor extends AbstractScreen {
     Batch batch = this.batch;
     batch.setProjectionMatrix(camera.combined);
     batch.begin();
-    newItem.draw(batch);
+    item.draw(batch);
     batch.end();
   }
 
   @Override
   public void act(float delta) {
     super.act(delta);
-    newItem.update(delta);
+    item.update(delta);
   }
 
   @Override

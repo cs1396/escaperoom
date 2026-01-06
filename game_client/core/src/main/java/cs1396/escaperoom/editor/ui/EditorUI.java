@@ -3,6 +3,7 @@ package cs1396.escaperoom.editor.ui;
 import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -35,12 +36,14 @@ import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.PropertyType;
 import cs1396.escaperoom.game.entities.properties.Stylable;
 import cs1396.escaperoom.game.entities.properties.values.Style;
+import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.screens.utils.ScreenManager;
-import cs1396.escaperoom.ui.FontManager;
+import cs1396.escaperoom.ui.FontBuilder;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 
 public class EditorUI {
@@ -83,10 +86,11 @@ public class EditorUI {
     ItemHintMode hintMode = ItemHintMode.Hover;
 
     ItemHint(){
-      super ("<no item> ID: -", "bubble");
+      super ("<no item> ID: -", G24LabelStyle.Bubble);
 
       LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
-      smallStyle.font = FontManager.size(16);
+      smallStyle.font = new FontBuilder().size(16).build();
+      smallStyle.fontColor = Color.RED;
       setStyle(smallStyle);
     }
 
@@ -120,13 +124,13 @@ public class EditorUI {
   }
 
   public class CoordHints extends HorizontalGroup {
-    private G24Label coords = new G24Label("x: _ y: _", "bubble");
+    private G24Label coords = new G24Label("x: _ y: _", G24LabelStyle.Bubble);
     private final int maxX, maxY;
 
     public CoordHints() {
 
       LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
-      smallStyle.font = FontManager.size(16);
+      smallStyle.font = new FontBuilder().size(16).build();
       coords.setStyle(smallStyle);
 
       maxX = LevelEditor.WORLD_WIDTH - 1;
@@ -180,7 +184,12 @@ public class EditorUI {
     root.top().left();
 
 
-    Menu sideBar = new Menu(null, screen.getMetadata().name , screen, true);
+    Menu sideBar = new Menu(null, screen.getMetadata().name, screen, true);
+
+    LabelStyle titleStyle = new LabelStyle(AbstractScreen.skin.get(LabelStyle.class));
+    titleStyle.font = new FontBuilder().size(32).build();
+    sideBar.getTitleLabel().setStyle(titleStyle);
+    
     sideBar.defaults().width(250);
     sideBar.setMovable(false);
 
@@ -195,8 +204,18 @@ public class EditorUI {
                 settings.persistentReveal,
                 (val) -> settings.persistentReveal = val
               ))
-          ).row();
-          m.addDivider();
+          ).left().row();
+          m.add(MenuEntry.toggle(m,
+              "Use default items",
+              new MenuInputOptions<Boolean>(
+                settings.usesDefaultItems,
+                (val) -> {
+                  settings.usesDefaultItems = val;
+                }
+              ))
+              .withToolTip("Whether or not to include default items\nin the item drawer")
+          ).left().row();
+          m.divider();
           m.add(MenuEntry.label("Default Zoom")
               .withToolTip("The zoom the player starts the game at.\nHigher is more zoomed out.")
           ).row();
@@ -209,17 +228,6 @@ public class EditorUI {
             ))
           ).row();
 
-          m.addDivider();
-
-          m.add(MenuEntry.toggle(m,
-              "Use default items",
-              new MenuInputOptions<Boolean>(
-                settings.usesDefaultItems,
-                (val) -> {
-                  settings.usesDefaultItems = val;
-                }
-              ))
-          ).row();
         
           m.pack();
           return m;
@@ -227,14 +235,14 @@ public class EditorUI {
         .build()
     ).row();
 
-    sideBar.addDivider();
+    sideBar.divider();
     sideBar.add(MenuEntry.sectionLabel("Tools")).row();
-    sideBar.addDivider();
+    sideBar.divider();
     sideBar.add(toolDrawer).center().pad(0).row();
 
-    sideBar.addDivider();
+    sideBar.divider();
     sideBar.add(MenuEntry.sectionLabel("Items")).row();
-    sideBar.addDivider();
+    sideBar.divider();
 
     // add item drawer
     ScrollPane scrollWrapper = new ScrollPane(itemDrawer);
@@ -263,7 +271,7 @@ public class EditorUI {
     );
 
 
-    G24TextButton playButton = new G24TextButton("Play");
+    G24TextButton playButton = new G24TextButton("Play", "med-text");
     playButton.setProgrammaticChangeEvents(false);
     playButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
@@ -278,7 +286,7 @@ public class EditorUI {
       }
     });
 
-    G24TextButton saveButton = new G24TextButton("Save");
+    G24TextButton saveButton = new G24TextButton("Save", "med-text");
     saveButton.setProgrammaticChangeEvents(false);
     saveButton.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
@@ -293,7 +301,7 @@ public class EditorUI {
       }
     });
 
-    G24TextButton newItemBtn = new G24TextButton("  New Item");
+    G24TextButton newItemBtn = new G24TextButton("New Item", "med-text");
     newItemBtn.setProgrammaticChangeEvents(false);
     newItemBtn.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
@@ -308,13 +316,13 @@ public class EditorUI {
       }
     });
 
-    G24TextButton reloadBtn = new G24TextButton("  Reload Items");
+    G24TextButton reloadBtn = new G24TextButton("Reload Items", "med-text");
     reloadBtn.setProgrammaticChangeEvents(false);
     reloadBtn.addListener(new ChangeListener() {
       public void changed(ChangeEvent event, Actor actor) {
         screen.reloadItems();
 
-        Notifier.error("reloaded all items");
+        Notifier.info("Reloaded all items!");
         reloadBtn.setChecked(false);
       }
     });

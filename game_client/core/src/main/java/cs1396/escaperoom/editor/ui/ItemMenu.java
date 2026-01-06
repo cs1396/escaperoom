@@ -1,6 +1,8 @@
 package cs1396.escaperoom.editor.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 
 import cs1396.escaperoom.editor.core.ToolManager.ToolType;
@@ -10,10 +12,14 @@ import cs1396.escaperoom.editor.tools.RotationTool.RotationAction;
 import cs1396.escaperoom.engine.assets.maps.MapSaver;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.base.ItemProperty.MenuType;
+import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.screens.utils.ScreenManager;
+import cs1396.escaperoom.ui.FontBuilder;
+import cs1396.escaperoom.ui.FontManager.FontStyle;
 import cs1396.escaperoom.ui.notifications.Notifier;
+import cs1396.escaperoom.ui.widgets.G24Label;
 
 public class ItemMenu extends Menu {
   Item item;
@@ -25,7 +31,7 @@ public class ItemMenu extends Menu {
     setPosition(uiPos.x, uiPos.y, Align.bottomLeft);
 
     add(MenuEntry.label("ID: " + item.getID())).row();
-    add(MenuEntry.divider()).row();
+    divider();
 
     if (target.getProperties().stream().anyMatch(p -> p.getInputType() != MenuType.None)) {
       add(new MenuEntryBuilder(this,"Properties")
@@ -35,7 +41,7 @@ public class ItemMenu extends Menu {
           .build())
         .row();
 
-      add(MenuEntry.divider()).row();;
+      divider();
     }
 
     add(new MenuEntryBuilder(this,"Edit Item Instance")
@@ -49,15 +55,6 @@ public class ItemMenu extends Menu {
         } else {
           Notifier.error("Failed to save map");
         }
-      })
-      .build())
-    .row();
-
-    add(new MenuEntryBuilder(this, "Delete")
-      .onClick(() -> {
-        ItemMenu.this.close();
-        item.remove(false);
-        editor.recordEditorAction(new Deletion(editor, item));
       })
       .build())
     .row();
@@ -110,6 +107,21 @@ public class ItemMenu extends Menu {
       .build())
     .row();
     pack();
+
+    G24Label deleteLabel = new G24Label("Delete");
+    LabelStyle style = new LabelStyle(AbstractScreen.skin.get(LabelStyle.class));
+    style.fontColor = Color.valueOf("C34043");
+    style.font = new FontBuilder().style(FontStyle.Bold).size(20).color(Color.valueOf("C34043")).build();
+    deleteLabel.setStyle(style);
+
+    add(new MenuEntryBuilder(this, deleteLabel)
+      .onClick(() -> {
+        ItemMenu.this.close();
+        item.remove(false);
+        editor.recordEditorAction(new Deletion(editor, item));
+      })
+      .build())
+    .row();
   }
 
 }

@@ -1,140 +1,146 @@
 package cs1396.escaperoom.editor.item.ui;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
-import com.badlogic.gdx.utils.Null;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
-import cs1396.escaperoom.engine.control.CursorManager;
-import cs1396.escaperoom.engine.control.CursorManager.CursorType;
+import cs1396.escaperoom.editor.ui.Menu;
+import cs1396.escaperoom.editor.ui.Menu.MenuEntryBuilder;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.PropertyType;
 import cs1396.escaperoom.game.entities.properties.base.ItemProperty;
-import cs1396.escaperoom.game.entities.properties.values.ItemPropertyValue;
 import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.ItemEditor;
+import cs1396.escaperoom.ui.FontBuilder;
+import cs1396.escaperoom.ui.FontManager.FontStyle;
 import cs1396.escaperoom.ui.widgets.G24Label;
 
 public class PropertyWorkspace extends ScrollPane {
-  // private HashMap<PropertyType, YogaNode> nodes = new HashMap<>();
-  private HashSet<PropertyPill<?,?>> pills = new HashSet<>();
-  private Table table;
+  private Table innerTable = new Table();
+  private Menu parent;
 
-  public class PropertyPill<V extends ItemPropertyValue, P extends ItemProperty<V>> extends G24Label {
+  private Table addPropertyEntry(ItemProperty<?> property){
+    Table ret = new Table();
+      ret.add(new MenuEntryBuilder(parent, property.getDescription().name)
+      .spawns((p) -> {
+        PropertyConfigurationMenu pcm = new PropertyConfigurationMenu(p, property);
+        pcm.divider();
+        ItemEditor.get().setOpenMenu(pcm);
 
-    P property;
+        G24Label label = new G24Label("Delete");
+        LabelStyle style = new LabelStyle(AbstractScreen.skin.get(LabelStyle.class));
+        style.fontColor = Color.valueOf("C34043");
+        style.font = new FontBuilder().style(FontStyle.Bold).size(20).color(Color.valueOf("C34043")).build();
+        label.setStyle(style);
 
-    public P getProperty(){
-      return property;
-    }
+        pcm.add(
+          new MenuEntryBuilder(pcm, label)
+            .onClick(() -> {
+              ItemEditor.get().getItem().removeProperty(property.getType());
+              ItemEditor.get().markModified();
+              populateFor(ItemEditor.get().getItem());
+              pcm.close();
+            })
+            .build()
+        );
 
-    public PropertyPill(P property) {
-      super(property.getDescription().name, "bubble");
-      addListener(CursorManager.hoverHelper(CursorType.Hand));
-      this.property = property;
+        return pcm;
+      })
+      .build()).growX();
 
-      ItemEditor.get().getDragAndDrop().addSource(new DragAndDrop.Source(this) {
-        @Override
-        public Payload dragStart(InputEvent event, float x, float y, int pointer) {
-          Payload pl = new Payload();
-          pl.setObject(property.getType());
-          G24Label l = new G24Label(property.getDescription().name, "bubble");
-          l.pack();
-          pl.setDragActor(l);
-
-          G24Label il = new G24Label(property.getDescription().name, "bubble");
-          il.setColor(1, 0, 0, 1);
-          il.pack();
-          pl.setInvalidDragActor(il);
-
-          G24Label vl = new G24Label(property.getDescription().name, "bubble");
-          vl.setColor(0, 1, 0, 1);
-          vl.pack();
-          pl.setValidDragActor(vl);
-
-          PropertyPill.this.setVisible(true);
-
-          return pl;
-        }
-        public void dragStop (InputEvent event, float x, float y, int pointer, @Null Payload payload, @Null Target target) {
-          if (target != null){
-            ItemEditor.get().getDragAndDrop().removeSource(this);
-            ItemEditor.get().getNewItem().removeProperty(property.getType());
-            PropertyPill.this.remove();
-            // TODO: fix this to work with table
-            // table.remove(nodes.get(property.getType()));
-            // nodes.remove(property.getType());
-            ItemEditor.get().markModified();
-          } else {
-            PropertyPill.this.setVisible(true);
-          }
-        }
-      });
-    }
-  }
-
-  private void addPill(ItemProperty<?> property){
-      PropertyPill<?,?> pill = new PropertyPill<>(property);
-      table.add(pill);
-      pills.add(pill);
-      table.pack();
-      ItemEditor.get().repack();
+    return ret;
   }  
 
-  public Set<PropertyPill<?,?>> getPills(){
-    return pills;
-  }
-
   public void populateFor(Item item){
-    table.clear();
-    table.pack();
-
-    ItemEditor.get().repack();
+    innerTable.clear();
 
     for (ItemProperty<?> prop : item.getProperties()){
-      addPill(prop);
+      Table row  = addPropertyEntry(prop);
+      innerTable.add(row).growX().row();
     }
+
+    innerTable.add(
+      new MenuEntryBuilder(parent, "+ Add Property")
+      .spawns((p) -> {
+        Menu m = new Menu(p, "Properties", ItemEditor.get());
+        ItemEditor.get().setOpenMenu(m);
+
+        Set<PropertyType> current = ItemEditor.get()
+          .getItem()
+          .getProperties()
+          .stream()
+          .map((prop) -> prop.getType())
+          .collect(Collectors.toSet());
+
+        LabelStyle invalid = new LabelStyle(AbstractScreen.skin.get(LabelStyle.class));
+        invalid.font = new FontBuilder().color(Color.valueOf("C34043")).build();
+        invalid.fontColor = Color.valueOf("C34043");
+
+        for (PropertyType propType : PropertyType.values()){
+          if (propType == PropertyType.InvalidProperty) continue;
+
+          ItemProperty<?> prop = propType.getEmptyProperty();
+          if (!current.contains(propType)){
+
+            boolean valid = true;
+            for (PropertyType curI : current){
+              if (prop.getDescription().mutallyExclusiveWith.contains(curI)){
+                valid = false;
+
+                G24Label label = new G24Label(prop.getDescription().name);
+                label.setStyle(invalid);
+
+                m.add(
+                  new MenuEntryBuilder(m, label)
+                  .build()
+                  .withToolTip("Conflicts with " + curI.getEmptyProperty().getDescription().name)
+                ).row();
+
+                break;
+              }
+            }
+
+            if (!valid) continue;
+
+            m.add(
+              new MenuEntryBuilder(m, prop.getDescription().name)
+              .onClick(() -> {
+                prop.apply(ItemEditor.get().getItem());
+                ItemEditor.get().getItem().addProperty(prop);
+                ItemEditor.get().markModified();
+                m.close();
+                populateFor(ItemEditor.get().getItem());
+              })
+              .build()
+            ).row();
+
+
+          } else {
+            G24Label label = new G24Label(prop.getDescription().name);
+            label.setStyle(invalid);
+
+            m.add(
+              new MenuEntryBuilder(m, label)
+              .build().withToolTip("Already Added")
+            ).row();
+          }
+        }
+        return m;
+      })
+      .build()
+    ).growX();
+
+    ItemEditor.get().repack();
   }
 
-  public PropertyWorkspace() {
+  public PropertyWorkspace(Menu parent) {
     super(null, AbstractScreen.skin);
-    table = new Table();
-    setActor(table);
-
-    ItemEditor.get().getDragAndDrop().addTarget(new DragAndDrop.Target(this) {
-
-      @Override
-      public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
-        PropertyType type = (PropertyType) payload.getObject();
-        if (ItemEditor.get().getNewItem().hasProperty(type) || 
-            ItemEditor.get().getNewItem().getProperties().stream().anyMatch(
-              (prop) -> { 
-                return prop.getDescription().mutallyExclusiveWith.contains(type); 
-              }
-            )
-        ) {
-          return false;
-        }
-        return true;
-      }
-
-      @Override
-      public void drop(Source source, Payload payload, float x, float y, int pointer) {
-        PropertyType type = (PropertyType) payload.getObject();
-        ItemProperty<? extends ItemPropertyValue> prop = type.getEmptyProperty();
-        ItemEditor.get().getNewItem().addProperty(prop);
-        prop.apply(ItemEditor.get().getNewItem());
-        addPill(prop);
-        ItemEditor.get().markModified();
-      }
-    });
-
+    this.parent = parent;
+    parent.add(innerTable);
+    setStyle(AbstractScreen.skin.get("nobkg", ScrollPaneStyle.class));
   }
 }

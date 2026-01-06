@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
@@ -984,6 +985,15 @@ public class Item implements Json.Serializable, Drawable {
   }
 
   /**
+   * @return x coordinate of the center of this item
+   *
+   */
+  public float getCenterX() {
+    float lowLeft = getX();
+    return lowLeft + occupiedSize.width / 2;
+  }
+
+  /**
    * @return y coordinate of the lower left corner of this item
    */
   public int getY() {
@@ -996,6 +1006,15 @@ public class Item implements Json.Serializable, Drawable {
         return position.y - occupiedSize.height + 1;
     }
     return position.y;
+  }
+
+  /**
+   * @return y coordinate of the center of this item
+   *
+   */
+  public float getCenterY() {
+    float lowLeft = getY();
+    return lowLeft + occupiedSize.height / 2;
   }
 
   /**

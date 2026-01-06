@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Align;
 
 import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public abstract class MenuScreen extends AbstractScreen {
   Texture background;
@@ -50,7 +51,7 @@ public abstract class MenuScreen extends AbstractScreen {
    * {@code onComplete} on its result on the render thread
    */
   public <T> void waitFor(CompletableFuture<T> future, CompletionHandler<T> onComplete, String loadMessage) {
-    G24Label l = new G24Label(loadMessage, "bubble");
+    G24Label l = new G24Label(loadMessage, G24LabelStyle.Bubble);
     l.setPosition(getUIStage().getWidth() / 2, getUIStage().getHeight() / 2, Align.center);
     l.pack();
     addUI(l);

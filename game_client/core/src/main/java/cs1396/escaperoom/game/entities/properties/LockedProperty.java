@@ -182,10 +182,19 @@ public class LockedProperty extends ItemProperty<LockingMethod> {
       "Availble Lock methods",
       null,
       new Select<LockingMethodType>(
-        (val) -> availableMethods.put((LockingMethodType)val, getEmptyLockMethod((LockingMethodType)val)),
-        (val) -> availableMethods.remove((LockingMethodType)val),
+        (val) -> {
+          availableMethods.put(val, getEmptyLockMethod(val));
+        },
+        (val) -> {
+          availableMethods.remove(val);
+          if (currentMethod.getType() == val){
+            currentMethod.onDetatch();
+            currentMethod = availableMethods.values().iterator().next();
+            currentMethod.onAttach(owner);
+          }
+        },
         LockingMethodType.values(),
-        (val) -> ((LockingMethodType)val).name(),
+        (val) -> val.name(),
         LockingMethodType.values().length,
         availableMethods.keySet().toArray(new LockingMethodType[0])
       )

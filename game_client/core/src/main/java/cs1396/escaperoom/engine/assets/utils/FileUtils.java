@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -105,7 +106,13 @@ public class FileUtils {
   }
 
   public static List<String> getFolders(String dir) {
-    return Stream.of(new File(dir).listFiles())
+    File[] f = new File(dir).listFiles();
+
+    if (f == null){
+      return new ArrayList<>();
+    } 
+
+    return Stream.of(f)
         .filter(file -> file.isDirectory())
         .map(File::getName)
         .collect(Collectors.toList());

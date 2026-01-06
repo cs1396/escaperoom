@@ -4,10 +4,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class ItemPayload extends DragAndDrop.Payload{
   public ItemPayload(Item i){
-    setDragActor(new G24Label(i.getItemName(), "bubble"));
+    setDragActor(new G24Label(i.getItemName(), G24LabelStyle.Bubble));
     setObject(i);
   }
 

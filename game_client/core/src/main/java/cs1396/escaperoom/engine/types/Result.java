@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,9 +18,17 @@ public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Resu
     }
   };
   public record IOErr<T>(String reason) implements Result<T, String> {
-    public static <T> IOErr<T> withLog(String reason, Logger log) {
-      log.severe(reason);
+    public static <T> IOErr<T> withLog(String reason, Logger log, Level level) {
+      log.log(level, reason);
       return new IOErr<>(reason);
+    }
+
+    public static <T> IOErr<T> withLog(String reason, Logger log) {
+      return withLog(reason, log, Level.SEVERE);
+    }
+
+    public static <T> IOErr<T> withLog(Error error, Logger log) {
+      return withLog(error.getMessage(), log, Level.SEVERE);
     }
   };
 
@@ -36,6 +45,13 @@ public sealed interface Result<T, E> permits cs1396.escaperoom.engine.types.Resu
       return ok.val();
     }
     throw new IllegalStateException("called unwrap() on Err");
+  }
+
+  default T expect(String msg) {
+    if (this instanceof Ok<T, E> ok) {
+      return ok.val();
+    }
+    throw new IllegalStateException(msg);
   }
 
   default E unwrapErr() {

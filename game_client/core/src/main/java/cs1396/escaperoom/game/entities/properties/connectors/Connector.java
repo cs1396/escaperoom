@@ -122,10 +122,10 @@ public class Connector extends PhantomProperty implements Connectable {
       "Connector Type",
       "",
       new Select<ConnectorType>(
-        (val) -> {this.type = (ConnectorType) val;}, 
+        (val) -> {this.type = val;}, 
         (val) -> {},
        ConnectorType.values(),
-        (val) -> ((ConnectorType)val).name(),
+        (val) -> val.name(),
         1,
         type
       )

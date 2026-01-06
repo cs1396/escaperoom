@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import cs1396.escaperoom.engine.BackManager;
 import cs1396.escaperoom.engine.control.ControlsManager;
 import cs1396.escaperoom.screens.AbstractScreen;
-import cs1396.escaperoom.ui.FontManager;
 import cs1396.escaperoom.ui.notifications.Notifier;
 
 public class G24TextInput extends TextArea {
@@ -94,14 +93,14 @@ public class G24TextInput extends TextArea {
           boolean isFocused = G24TextInput.this.getStage().getKeyboardFocus() == G24TextInput.this;
           if (!isFocused) return false;
 
-          G24TextInput.this.getStage().setKeyboardFocus(G24TextInput.this.getParent());
+          G24TextInput.this.getStage().setKeyboardFocus(null);
           return true;
         });
       } else {
         ControlsManager.setKeyboardEnabled(true);
       }
 
-      return true;
+      return false;
     }
   }
 

@@ -15,33 +15,34 @@ import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.IntInput;
 import cs1396.escaperoom.ui.widgets.G24TextInput.StringInput;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.FloatInput;
 
 public class PropertyConfiguration extends Table implements HandlesMenuClose {
 
   public static class Select<T> extends VerticalGroup {
-    public interface OnSelect{
-      public void onChange(Object newVal);
+    public interface OnSelect<T>{
+      public void onChange(T newVal);
     }
-    public interface OnDeselect{
-      public void onChange(Object newVal);
+    public interface OnDeselect<T>{
+      public void onChange(T newVal);
     }
-    public interface Stringify{
-      public String stringify(Object val);
+    public interface Stringify<T>{
+      public String stringify(T val);
     }
 
     public Select(
-      OnSelect onSelect,
-      OnDeselect onDeselect,
+      OnSelect<T> onSelect,
+      OnDeselect<T> onDeselect,
       T[] options,
-      Stringify toDisplay,
+      Stringify<T> toDisplay,
       int maxSelected,
       T ... initialSelections
     ){
       columnLeft();
       ButtonGroup<CheckBox> checkBtnGroup = new ButtonGroup<>();
       checkBtnGroup.setMaxCheckCount(maxSelected);
-      checkBtnGroup.setMinCheckCount(1);
+      checkBtnGroup.setMinCheckCount(0);
 
       HashMap<T, CheckBox> buttonMap = new HashMap<>();
 
@@ -111,7 +112,7 @@ public class PropertyConfiguration extends Table implements HandlesMenuClose {
   }
 
   public void addElement(String label, String helpString, Actor a, boolean separateByLine){
-    G24Label labelEl = new G24Label(label + ":", "default");
+    G24Label labelEl = new G24Label(label + ":", G24LabelStyle.Default);
 
     if (helpString != null && !helpString.isEmpty()){
       new Tooltip.Builder(helpString).target(labelEl, Tooltip.stageHelper(labelEl)).build();
@@ -125,7 +126,7 @@ public class PropertyConfiguration extends Table implements HandlesMenuClose {
   }
 
   public void addLine() {
-    add(new G24Label("", "default")).row();
+    add(new G24Label("", G24LabelStyle.Default)).row();
   }
 
 	@Override

@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.GameScreen;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 /**
  * Captures all player actions and emits to a UI element in the bottom left hand corner 
@@ -41,14 +42,14 @@ public class ActionLog extends ScrollPane {
    * @param message to emit 
    */
   public void emit(String message){
-    emit(message, "white");
+    emit(message, G24LabelStyle.White);
   }
 
   /**
    * @param content conten of a label 
    * @param style a label style to use
    */
-  public void emit(String content, String style){
+  public void emit(String content, G24LabelStyle style){
     inner.row();
     G24Label l = new G24Label(content, style);
     l.setWrap(true);
