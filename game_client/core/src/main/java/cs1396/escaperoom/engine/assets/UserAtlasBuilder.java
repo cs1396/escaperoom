@@ -1,7 +1,6 @@
 package cs1396.escaperoom.engine.assets;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
@@ -62,7 +61,6 @@ public class UserAtlasBuilder {
       settings.maxHeight = 2048;
       settings.bleed = false;
       TexturePacker.process(settings, textureDir.getAbsolutePath(), atlasDir.getAbsolutePath(), "atlas");
-      AssetManager.instance().invalidateTextureCache();
       return new Ok<>(atlas);
     } catch (Exception e){
       e.printStackTrace();

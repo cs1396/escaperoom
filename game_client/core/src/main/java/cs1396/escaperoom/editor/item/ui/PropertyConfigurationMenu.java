@@ -22,18 +22,18 @@ public class PropertyConfigurationMenu extends Menu {
     }
   }
 
-  public PropertyConfigurationMenu(ItemProperty<? extends ItemPropertyValue> property){
-    super(null, property.getDescription().name, ItemEditor.screen);
+  public PropertyConfigurationMenu(MenuEntry parent, ItemProperty<? extends ItemPropertyValue> property){
+    super(parent, property.getDescription().name, ItemEditor.screen);
 
     add(new SpecialLittleTinyBabyLabel(property.getDescription().shortDesc)).row();
-    add(MenuEntry.divider()).row();
+    divider();
 
     property.getCustomItemConfigurationMenu().ifPresent((config) -> {
       add(new MenuEntryBuilder(this, "Configure")
-        .spawns((parent) -> {
+        .spawns((p) -> {
           ItemEditor.get().markModified();
           return new ConfigurationMenu<>(
-            parent, 
+            p, 
             config,
             property.getDescription().name + " Configuration", 
             screen);
@@ -43,9 +43,9 @@ public class PropertyConfigurationMenu extends Menu {
     });
 
     add(new MenuEntryBuilder(this, "Help")
-      .spawns((parent) -> {
+      .spawns((p) -> {
         return new ConfigurationMenu<>(
-          parent, 
+          p, 
           new SpecialLittleTinyBabyLabel(property.getDescription().longDesc),
           property.getDescription().name + " Details", 
           screen);
@@ -55,7 +55,7 @@ public class PropertyConfigurationMenu extends Menu {
 
     if (!property.getDescription().mutallyExclusiveWith.isEmpty()){
       add(new MenuEntryBuilder(this, "Conflicting Properties ")
-        .spawns((parent) -> {
+        .spawns((pa) -> {
 
           ConfigurationMenu.VGroup conflicts = new ConfigurationMenu.VGroup();
           property.getDescription().mutallyExclusiveWith.forEach((p) -> {
@@ -65,7 +65,7 @@ public class PropertyConfigurationMenu extends Menu {
           });
 
           return new ConfigurationMenu<>(
-            parent, 
+            pa, 
             conflicts,
             property.getDescription().name + " Conflicts", 
             screen);

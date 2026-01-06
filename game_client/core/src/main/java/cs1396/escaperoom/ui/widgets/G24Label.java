@@ -26,11 +26,6 @@ public class G24Label extends Label {
     this(content, "default", 0.65f);
   }
 
-  @Deprecated
-  public G24Label(String content, String style){
-    this(content, style, 0.65f);
-  }
-
   public G24Label(String content, G24LabelStyle style){
     this(content, style.styleID, 0.65f);
   }

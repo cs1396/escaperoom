@@ -35,7 +35,7 @@ public class AnimatedProperty extends PhantomProperty {
   }
 
 
-  private int numFrames;
+  private int numFrames = 1;
   private int textureOffsetPerFrame;
   private float frameLength;
   private int width;
@@ -144,7 +144,6 @@ public class AnimatedProperty extends PhantomProperty {
 
   @Override
   public void apply(Item item){
-    super.apply(item);
     defaultConfiguration(item);
   }
 

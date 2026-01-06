@@ -42,7 +42,7 @@ public class ItemDrawer extends Tree<cs1396.escaperoom.editor.tools.ItemDrawer.I
       ItemSlot s  = new ItemSlot(item);
       s.setTouchable(Touchable.disabled);
       add(s);
-      G24Label label = new G24Label(item.getItemName());
+      G24Label label = new G24Label(item.getItemName(), G24LabelStyle.DefaultMedText);
       label.setTouchable(Touchable.disabled);
       add(label).minWidth(100);
 
@@ -125,7 +125,7 @@ public class ItemDrawer extends Tree<cs1396.escaperoom.editor.tools.ItemDrawer.I
         getSelection().clear();
         Payload p = new DragAndDrop.Payload();
         p.setObject(node.getValue());
-        G24Label l = new G24Label(Item.class.cast(node.getValue()).getItemName(), "default");
+        G24Label l = new G24Label(Item.class.cast(node.getValue()).getItemName(), G24LabelStyle.Default);
         p.setDragActor(l);
         return p;
       }

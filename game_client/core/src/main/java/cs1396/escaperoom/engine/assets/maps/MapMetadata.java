@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 
 import cs1396.escaperoom.engine.assets.utils.FileUtils;
+import cs1396.escaperoom.engine.types.SemVer;
 import cs1396.escaperoom.services.GameStatistics;
 import cs1396.escaperoom.services.User;
 
@@ -78,6 +79,7 @@ public class MapMetadata implements Json.Serializable {
   public Optional<String> objectDirectory = Optional.empty();
   public GameSettings gameSettings = new GameSettings();
   String startingGrid = MapData.DEFAULT_GRID_NAME;
+  SemVer mapVersion = new SemVer(0L, 0L, 0L);
 
   public MapMetadata(String name, boolean downloaded){
     this.locations = new MapLocation(name, downloaded);

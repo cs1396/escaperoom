@@ -12,6 +12,8 @@ import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
+
 
 /**
  * Utility class to manage the undo/redo history 
@@ -26,7 +28,7 @@ public class ActionHistory {
   private void buildToolTip(String title, Input input, Actor target){
     String label = title;
     label += "\n Hotkey(s): " + String.join("\n",input.description().bindings);
-    G24Label l = new G24Label(label, "bubble_gray");
+    G24Label l = new G24Label(label, G24LabelStyle.BubbleGray);
     l.pack();
     new Tooltip.Builder(l).target(target, () -> Optional.of(target.getStage())).build();
   }

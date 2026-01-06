@@ -29,8 +29,7 @@ import cs1396.escaperoom.ui.widgets.G24Window;
 
 public class Menu extends G24Window {
   Array<Menu> spawned = new Array<>();
-  // TODO: Make this a func after refac
-  public AbstractScreen screen;
+  protected AbstractScreen screen;
   @Null MenuEntry parent;
   boolean movedIndependent = false;
   Vector2 parentRelativeOffset = new Vector2();
@@ -111,9 +110,18 @@ public class Menu extends G24Window {
   }
 
 
-  public static class MenuEntryBuilder {
-    final Actor content;
+  public static abstract class AbstractBuilder<M extends MenuEntry, B extends AbstractBuilder<M,B>> {
     final Menu parent;
+    public AbstractBuilder(Menu parent){
+      this.parent = parent;
+    }
+
+    protected abstract B self();
+    public abstract M build();
+  }
+
+  public static class MenuEntryBuilder extends AbstractBuilder<MenuEntry, MenuEntryBuilder> {
+    final Actor content;
     @Null SpawnsMenu menuSpawner; 
     SelectionHandler onSelect = () -> {}; 
     SelectionHandler onDeselect = () -> {} ; 
@@ -122,13 +130,12 @@ public class Menu extends G24Window {
     boolean selected = false;
 
     public MenuEntryBuilder(Menu parent, Actor content){
+      super(parent);
       this.content = content;
-      this.parent = parent;
     }
 
     public MenuEntryBuilder(Menu parent, String label){
-      this.content = new MenuLabel(label);
-      this.parent = parent;
+      this(parent, new MenuLabel(label));
     }
 
     public MenuEntryBuilder spawns(SpawnsMenu action){
@@ -158,6 +165,8 @@ public class Menu extends G24Window {
       this.selected = selected;
       return this;
     }
+
+    protected MenuEntryBuilder self(){ return this; }
 
     public MenuEntry build(){
       MenuEntry e = new MenuEntry(parent, content, menuSpawner, onSelect, onDeselect, onClick, selectable);
@@ -211,6 +220,7 @@ public class Menu extends G24Window {
       return new TextureRegionDrawable(new TextureRegion(bkg));
     }
 
+    @Deprecated
     public static MenuEntry divider(){
       MenuEntry entry = new MenuEntry();
       entry.setBackground(loadDividerBackground());
@@ -306,10 +316,11 @@ public class Menu extends G24Window {
     private MenuEntry(){}
 
     public void createNewMenu(Menu m){
+      m.pack();
       parent.spawned.add(m);
       parent.screen.addUI(m);
 
-      Vector2 entryBorder = MenuEntry.this.localToStageCoordinates(new Vector2(MenuEntry.this.getWidth(),0));
+      Vector2 entryBorder = MenuEntry.this.localToStageCoordinates(new Vector2(MenuEntry.this.getWidth()+2,0));
       m.setPosition(entryBorder.x, entryBorder.y);
       m.movedIndependent = false;
       m.parentRelativeOffset.set(entryBorder.x - parent.getX(),  entryBorder.y - parent.getY());
@@ -333,7 +344,7 @@ public class Menu extends G24Window {
       left();
       padLeft(5);
       loadBackground();
-      add(entryContent).left().expandX().fillX();
+      add(entryContent).left().expandX();
 
       content = entryContent;
       spawnsMenu = spawner;
@@ -428,14 +439,14 @@ public class Menu extends G24Window {
     this.screen = screen;
     parent = parentMenu;
 
-    padTop(30);
+    padTop(35);
     padLeft(5);
-    defaults().pad(0).align(Align.topLeft).expandX().growX();
+    defaults().pad(0).growX().align(Align.topLeft);
     add(MenuEntry.divider()).growX().row();
 	}
 
-  public void addDivider(){
-    add(MenuEntry.divider()).minHeight(20).row();
+  public void divider(){
+    add(MenuEntry.divider()).minHeight(20).growX().row();
   }
   
 }

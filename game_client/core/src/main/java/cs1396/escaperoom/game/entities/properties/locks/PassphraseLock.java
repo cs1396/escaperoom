@@ -154,7 +154,7 @@ public class PassphraseLock extends LockingMethod implements StringItemPropertyV
         menu.add(new G24Label("Passphrase:", G24LabelStyle.Underline)).row();
         menu.add(input).row();
 
-        menu.add(MenuEntry.divider()).row();
+        menu.divider();
 
         menu.add(
           MenuEntry.toggle(

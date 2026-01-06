@@ -79,6 +79,7 @@ public class PropertyMenu extends Menu {
 
           popOutMenu.parent = entryParent;
           group.entries.forEach((ent) -> popOutMenu.add(ent).row());
+          popOutMenu.pack();
           return popOutMenu;
         })
         .build();
@@ -114,9 +115,9 @@ public class PropertyMenu extends Menu {
       entry.setSelected();
     }
 
-    add(MenuEntry.divider()).row();
+    divider();
     add(new PropertyMenuEntry(entry, property)).row();
-    add(MenuEntry.divider()).row();
+    divider();
   }
 
   public static class PropertyMenuEntry extends MenuEntry {

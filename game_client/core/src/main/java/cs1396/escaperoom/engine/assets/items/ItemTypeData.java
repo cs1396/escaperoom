@@ -97,7 +97,7 @@ public class ItemTypeData implements Serializable, Json.Serializable {
     });
     json.writeObjectEnd();
 
-    json.writeValue("texture",texture + ".png");
+    json.writeValue("texture", texture);
     json.writeValue("render_priority", renderPriority);
   }
 
@@ -127,9 +127,13 @@ public class ItemTypeData implements Serializable, Json.Serializable {
     }
 
     String texture = jsonData.getString("texture");
-    int render_priority = jsonData.getInt("render_priority", 1);
-    String texture_id = texture.substring(0, texture.lastIndexOf(".png"));
+    int renderPriority = jsonData.getInt("render_priority", 1);
 
-    init(name, category, size, texture_id, render_priority, validProperties);
+    // NOTE: For backwards compatability in Map serialization/deserialization.
+    // For a texture with filename assets/entity_textures/texture.png
+    if (texture.endsWith(".png")) texture = texture.substring(0, texture.length() - 4);
+
+
+    init(name, category, size, texture, renderPriority, validProperties);
   }
 }
