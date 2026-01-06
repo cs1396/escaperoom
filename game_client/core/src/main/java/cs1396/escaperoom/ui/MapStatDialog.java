@@ -25,6 +25,7 @@ import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Dialog;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class MapStatDialog extends G24Dialog {
   Container<Image> thumbnailContainer;
@@ -107,10 +108,10 @@ public class MapStatDialog extends G24Dialog {
     desc.space(10);
     desc.columnLeft();
 
-    G24Label titleLabel = new G24Label("Description", "title");
+    G24Label titleLabel = new G24Label("Description", G24LabelStyle.Title);
     desc.addActor(titleLabel);
 
-    G24Label descLabel = new G24Label(stats.description, "default");
+    G24Label descLabel = new G24Label(stats.description, G24LabelStyle.Default);
     descLabel.setWrap(true);
     descLabel.setAlignment(Align.left);
 
@@ -122,8 +123,8 @@ public class MapStatDialog extends G24Dialog {
     t.add(desc).left().top().padTop(20).padRight(10);
     t.row();
 
-    t.add(new G24Label("Map Statstics", "title")).center();
-    t.add(new G24Label("World Record", "title")).center();
+    t.add(new G24Label("Map Statstics", G24LabelStyle.Title)).center();
+    t.add(new G24Label("World Record", G24LabelStyle.Title)).center();
     t.row();
     t.add(statGroup).minWidth(200).top();
     t.add(wrGroup).minWidth(200).top();

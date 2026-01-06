@@ -3,9 +3,9 @@ package cs1396.escaperoom.ui;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 /**
  * Utility font classs for building custom one-off styles
@@ -17,7 +17,7 @@ public class FontManager {
     Bold("bold"),
     ;
 
-    private HashMap <Integer, BitmapFont> sizes = new HashMap<>();
+    private HashMap <Integer, HashMap<Color, BitmapFont>> fonts = new HashMap<>();
     private FreeTypeFontGenerator generator;
 
     private FontStyle(String fileName){
@@ -25,18 +25,18 @@ public class FontManager {
     }
   }
 
-  public static BitmapFont size(int pixels){
-    return size(FontStyle.Regular, pixels);
-  }
+  public static BitmapFont get(FontBuilder builder){
 
-  public static BitmapFont size(FontStyle style, int pixels){
-    if (!style.sizes.containsKey(pixels)){
-      FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-      parameter.size = pixels;
-      BitmapFont font = style.generator.generateFont(parameter);
-      style.sizes.put(pixels, font);
+    if (builder.style.fonts.get(builder.size) == null){
+      builder.style.fonts.put(builder.size, new HashMap<>());
     }
 
-    return style.sizes.get(pixels);
+    if (builder.style.fonts.get(builder.size).get(builder.color) == null){
+      BitmapFont font = builder.style.generator.generateFont(builder.asParams());
+      builder.style.fonts.get(builder.size).put(builder.color, font);
+    }
+
+    return builder.style.fonts.get(builder.size).get(builder.color);
   }
+
 }

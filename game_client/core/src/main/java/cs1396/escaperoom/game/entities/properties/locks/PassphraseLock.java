@@ -17,6 +17,7 @@ import cs1396.escaperoom.game.entities.properties.values.StringItemPropertyValue
 import cs1396.escaperoom.game.state.GameContext;
 import cs1396.escaperoom.game.ui.GameDialog;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24TextInput;
 
@@ -150,7 +151,7 @@ public class PassphraseLock extends LockingMethod implements StringItemPropertyV
           }
         });
 
-        menu.add(new G24Label("Passphrase:", "underline")).row();
+        menu.add(new G24Label("Passphrase:", G24LabelStyle.Underline)).row();
         menu.add(input).row();
 
         menu.add(MenuEntry.divider()).row();

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 /**
  * A {@link ToolButton}
@@ -21,7 +22,7 @@ public class ToolButton extends ImageButton {
     if (tool.getType().getHotKey() != null){
       label += "\nHotKey(s): " + String.join("\n",tool.getType().getHotKey().description().bindings);
     }
-    G24Label l = new G24Label( label, "bubble_gray");
+    G24Label l = new G24Label( label, G24LabelStyle.BubbleGray);
     l.pack();
     new Tooltip.Builder(l).target(this, () -> Optional.of(this.getStage())).build();
 

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import cs1396.escaperoom.ui.notifications.NotificationBus.NotificationListener;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class NotificationOverlay extends Table implements NotificationListener {
   private final Array<Toast> activeNotifiations = new Array<>();
@@ -18,7 +19,7 @@ public class NotificationOverlay extends Table implements NotificationListener {
 
     Toast(Notification notif){
       this.notification = notif;
-      setActor(new G24Label(notification.getMessage(), "bubble"));
+      setActor(new G24Label(notification.getMessage(), G24LabelStyle.Bubble));
     }
   }
 

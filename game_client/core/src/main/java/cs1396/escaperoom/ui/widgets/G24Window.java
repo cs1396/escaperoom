@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import cs1396.escaperoom.screens.AbstractScreen;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class G24Window extends Window  {
   protected G24Label label;
@@ -27,7 +28,7 @@ public class G24Window extends Window  {
     window.getTitleTable().defaults().pad(10);
     G24Label label = null;
     if (!title.isEmpty()){
-      label = new G24Label(title, "bubble");
+      label = new G24Label(title, G24LabelStyle.Bubble);
     }
     window.getTitleTable().add(label).align(Align.center).padBottom(15);
     window.padTop(40);
@@ -36,7 +37,7 @@ public class G24Window extends Window  {
 
   @Override 
   public Label getTitleLabel(){
-    return label;
+    return label != null ? label : super.getTitleLabel();
   }
 
   public void close() {

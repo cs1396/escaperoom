@@ -19,6 +19,7 @@ import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.ItemSelectUI;
 import cs1396.escaperoom.ui.ItemSelectUI.SelectedItem;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class ItemInArea extends Conditional {
   Logger log = Logger.getLogger(ItemInArea.class.getName());
@@ -87,14 +88,14 @@ public class ItemInArea extends Conditional {
 
     ItemInRegionUI itemInRegionUI = new ItemInRegionUI();
 
-    itemInRegionUI.add(new G24Label("Item", "underline"));
+    itemInRegionUI.add(new G24Label("Item", G24LabelStyle.Underline));
     itemInRegionUI.row();
 
     ItemSelectUI selectUI = new ItemSelectUI(potentialItems, this.item, "No obtainable items are currently on the grid!", screen);
     itemInRegionUI.add(selectUI);
     itemInRegionUI.row();
 
-    itemInRegionUI.add(new G24Label("Region", "underline"));
+    itemInRegionUI.add(new G24Label("Region", G24LabelStyle.Underline));
     itemInRegionUI.row();
 
     AreaUI areaUI = new AreaUI(screen, this.targetRegion);

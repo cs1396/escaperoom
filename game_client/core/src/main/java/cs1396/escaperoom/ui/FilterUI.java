@@ -31,6 +31,7 @@ import cs1396.escaperoom.ui.widgets.G24Dialog;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24TextInput;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class FilterUI extends G24Dialog {
   DragAndDrop dragAndDrop = new DragAndDrop();
@@ -81,8 +82,8 @@ public class FilterUI extends G24Dialog {
     });
 
 
-    getContentTable().add(new G24Label("Fields", "title")).center();
-    getContentTable().add(new G24Label("Methods", "title")).center().row();
+    getContentTable().add(new G24Label("Fields", G24LabelStyle.Title)).center();
+    getContentTable().add(new G24Label("Methods", G24LabelStyle.Title)).center().row();
     getContentTable().add(fieldSources).top();
     getContentTable().add(methodSources).top();
     getContentTable().add(box).top().row();
@@ -158,10 +159,10 @@ public class FilterUI extends G24Dialog {
 
       valueInput = new G24TextInput();
 
-      methodLabel = new G24Label("<empty>", "bubble");
+      methodLabel = new G24Label("<empty>", G24LabelStyle.Bubble);
       methodTarget = new MethodTarget(methodLabel);
 
-      fieldLabel = new G24Label("<empty>", "bubble");
+      fieldLabel = new G24Label("<empty>", G24LabelStyle.Bubble);
       fieldTarget = new FieldTarget(fieldLabel);
 
       dragAndDrop.addTarget(methodTarget);
@@ -363,7 +364,7 @@ public class FilterUI extends G24Dialog {
       filterComboBtnGroup.add(andCombo, orCombo);
       andCombo.setChecked(true);
 
-      filterComboBox.addActor(new G24Label("Filter Combination:", "title"));
+      filterComboBox.addActor(new G24Label("Filter Combination:", G24LabelStyle.Title));
       filterComboBox.addActor(andCombo);
       filterComboBox.addActor(orCombo);
 
@@ -385,7 +386,7 @@ public class FilterUI extends G24Dialog {
       });
 
       HorizontalGroup sortOnBox = new HorizontalGroup();
-      G24Label fieldLabel = new G24Label(defaultSortField.displayName(), "bubble");
+      G24Label fieldLabel = new G24Label(defaultSortField.displayName(), G24LabelStyle.Bubble);
       ButtonGroup<CheckBox> sortDirGroup = new ButtonGroup<>();
 
       CheckBox ascCheck = new CheckBox("Ascending", AbstractScreen.skin);
@@ -427,7 +428,7 @@ public class FilterUI extends G24Dialog {
         }
       });
 
-      sortOnBox.addActor(new G24Label("Sort on:", "title"));
+      sortOnBox.addActor(new G24Label("Sort on:", G24LabelStyle.Title));
       sortOnBox.addActor(fieldLabel);
       sortOnBox.addActor(descCheck);
       sortOnBox.addActor(ascCheck);
@@ -498,14 +499,14 @@ public class FilterUI extends G24Dialog {
 
   private class FieldSourceLabel extends G24Label {
     FieldSourceLabel(IsField field) {
-      super(field.displayName(), "bubble");
+      super(field.displayName(), G24LabelStyle.Bubble);
       dragAndDrop.addSource(new FieldBankSource(this, field));
     }
   }
 
   private class MethodSourceLabel extends G24Label {
     MethodSourceLabel(Filter.Method method) {
-      super(filterDisplayString(method), "bubble");
+      super(filterDisplayString(method), G24LabelStyle.Bubble);
       dragAndDrop.addSource(new MethodBankSource(this, method));
     }
   }
@@ -539,16 +540,16 @@ public class FilterUI extends G24Dialog {
 
   private static class FieldPayload extends DragAndDrop.Payload {
     public FieldPayload(IsField field) {
-      G24Label actor = new G24Label(field.displayName(), "bubble");
+      G24Label actor = new G24Label(field.displayName(), G24LabelStyle.Bubble);
       actor.pack();
       setDragActor(actor);
 
-      G24Label invalid = new G24Label(field.displayName(), "bubble");
+      G24Label invalid = new G24Label(field.displayName(), G24LabelStyle.Bubble);
       invalid.setColor(1, 0.8f, 0.8f, 0.8f);
       invalid.pack();
       setInvalidDragActor(invalid);
 
-      G24Label valid = new G24Label(field.displayName(), "bubble");
+      G24Label valid = new G24Label(field.displayName(), G24LabelStyle.Bubble);
       valid.setColor(0.8f, 1, 0.8f, 0.8f);
       valid.pack();
       setValidDragActor(valid);
@@ -565,16 +566,16 @@ public class FilterUI extends G24Dialog {
     public MethodPayload(Filter.Method method) {
 
       String s = filterDisplayString(method);
-      G24Label actor = new G24Label(s, "bubble");
+      G24Label actor = new G24Label(s, G24LabelStyle.Bubble);
       actor.pack();
       setDragActor(actor);
 
-      G24Label invalid = new G24Label(s, "bubble");
+      G24Label invalid = new G24Label(s, G24LabelStyle.Bubble);
       invalid.setColor(1, 0.8f, 0.8f, 0.8f);
       invalid.pack();
       setInvalidDragActor(invalid);
 
-      G24Label valid = new G24Label(s, "bubble");
+      G24Label valid = new G24Label(s, G24LabelStyle.Bubble);
       valid.setColor(0.8f, 1, 0.8f, 0.8f);
       valid.pack();
       setValidDragActor(valid);

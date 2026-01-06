@@ -3,6 +3,7 @@ package cs1396.escaperoom.editor.ui;
 import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -35,12 +36,14 @@ import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.properties.PropertyType;
 import cs1396.escaperoom.game.entities.properties.Stylable;
 import cs1396.escaperoom.game.entities.properties.values.Style;
+import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.screens.utils.ScreenManager;
-import cs1396.escaperoom.ui.FontManager;
+import cs1396.escaperoom.ui.FontBuilder;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 
 public class EditorUI {
@@ -83,10 +86,11 @@ public class EditorUI {
     ItemHintMode hintMode = ItemHintMode.Hover;
 
     ItemHint(){
-      super ("<no item> ID: -", "bubble");
+      super ("<no item> ID: -", G24LabelStyle.Bubble);
 
       LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
-      smallStyle.font = FontManager.size(16);
+      smallStyle.font = new FontBuilder().size(16).build();
+      smallStyle.fontColor = Color.RED;
       setStyle(smallStyle);
     }
 
@@ -120,13 +124,13 @@ public class EditorUI {
   }
 
   public class CoordHints extends HorizontalGroup {
-    private G24Label coords = new G24Label("x: _ y: _", "bubble");
+    private G24Label coords = new G24Label("x: _ y: _", G24LabelStyle.Bubble);
     private final int maxX, maxY;
 
     public CoordHints() {
 
       LabelStyle smallStyle = new LabelStyle(LevelEditor.skin.get("bubble", LabelStyle.class));
-      smallStyle.font = FontManager.size(16);
+      smallStyle.font = new FontBuilder().size(16).build();
       coords.setStyle(smallStyle);
 
       maxX = LevelEditor.WORLD_WIDTH - 1;

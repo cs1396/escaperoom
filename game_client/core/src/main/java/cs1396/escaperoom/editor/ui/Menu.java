@@ -22,6 +22,7 @@ import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.FloatInput;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.IntInput;
 import cs1396.escaperoom.ui.widgets.G24Window;
@@ -168,7 +169,7 @@ public class Menu extends G24Window {
 
   public static class MenuLabel extends G24Label {
     public MenuLabel(String label){
-      super(label, "default");
+      super(label, G24LabelStyle.Default);
     }
   }
 
@@ -274,7 +275,7 @@ public class Menu extends G24Window {
     }
 
     public static MenuEntry sectionLabel(String content){
-      MenuEntry entry = new MenuEntry(null, new G24Label(content, "default-med-text"), null, null, null, null, false);
+      MenuEntry entry = new MenuEntry(null, new G24Label(content, G24LabelStyle.DefaultMedText), null, null, null, null, false);
       return entry;
     }
 
@@ -342,7 +343,7 @@ public class Menu extends G24Window {
       onSelect = selectHandler;
       onDeselect = deselectHandler;
 
-      if (spawner != null) add(new G24Label(">", "default")).right().padRight(2);
+      if (spawner != null) add(new G24Label(">", G24LabelStyle.Default)).right().padRight(2);
 
       addListener(new InputListener() {
         public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) { 

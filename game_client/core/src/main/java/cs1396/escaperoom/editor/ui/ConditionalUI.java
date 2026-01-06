@@ -38,6 +38,7 @@ import cs1396.escaperoom.game.entities.properties.base.ConditionalProperty;
 import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24Label;
 
 public class ConditionalUI extends Table implements HandlesMenuClose {
@@ -112,8 +113,8 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
       innerVGroup.space(10);
       innerVGroup.align(Align.center);
 
-      label = cond.getType() == ConditionalType.EmptyConditional ? new G24Label("<empty>", "bubble")
-          : new G24Label(cond.getName(), "bubble");
+      label = cond.getType() == ConditionalType.EmptyConditional ? new G24Label("<empty>", G24LabelStyle.Bubble)
+          : new G24Label(cond.getName(), G24LabelStyle.Bubble);
       innerVGroup.addActor(label);
 
       // add a remove source
@@ -176,10 +177,10 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     public Payload dragStart(InputEvent event, float x, float y, int pointer) {
       Payload p = new Payload();
       source.setVisible(false);
-      G24Label valid = new G24Label(source.val.getName(), "bubble");
+      G24Label valid = new G24Label(source.val.getName(), G24LabelStyle.Bubble);
       valid.setColor(0.75f, 1, 0.75f, 0.5f);
 
-      G24Label invalid = new G24Label(source.val.getName(), "bubble");
+      G24Label invalid = new G24Label(source.val.getName(), G24LabelStyle.Bubble);
       invalid.setColor(1, 0.75f, 0.75f, 0.5f);
 
       p.setValidDragActor(valid);
@@ -222,7 +223,7 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     Conditional c;
 
     public ConditionalSource(Conditional c) {
-      super(new G24Label(c.getName(), "bubble"));
+      super(new G24Label(c.getName(), G24LabelStyle.Bubble));
       getActor().addListener(CursorManager.hoverHelper(CursorType.Hand));
       this.c = c;
     }
@@ -231,10 +232,10 @@ public class ConditionalUI extends Table implements HandlesMenuClose {
     public Payload dragStart(InputEvent event, float x, float y, int pointer) {
       Payload p = new Payload();
 
-      G24Label valid = new G24Label(c.getName(), "bubble");
+      G24Label valid = new G24Label(c.getName(), G24LabelStyle.Bubble);
       valid.setColor(0.75f, 1, 0.75f, 0.5f);
 
-      G24Label invalid = new G24Label(c.getName(), "bubble");
+      G24Label invalid = new G24Label(c.getName(), G24LabelStyle.Bubble);
       invalid.setColor(1, 0.75f, 0.75f, 0.5f);
 
       p.setValidDragActor(valid);

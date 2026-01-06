@@ -15,6 +15,7 @@ import cs1396.escaperoom.engine.control.bindings.MapGroup;
 import cs1396.escaperoom.engine.control.input.Input;
 import cs1396.escaperoom.engine.control.input.Input.MappingDescription;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class KeyMapTable extends Container<ScrollPane> {
   Table inner = new Table();
@@ -26,14 +27,14 @@ public class KeyMapTable extends Container<ScrollPane> {
 
     for (MapGroup group : groups){
       if (group == MapGroup.DEBUG) continue;
-      inner.add(new G24Label(group.toString(), "title", 1f)).center().colspan(2).row();
+      inner.add(new G24Label(group.toString(), G24LabelStyle.Title)).center().colspan(2).row();
       for (Input input : keymaps.get(group)){
         MappingDescription desc = input.description();
-        inner.add(new G24Label(desc.desc, "bubble"));
+        inner.add(new G24Label(desc.desc, G24LabelStyle.Bubble));
         HorizontalGroup hg = new HorizontalGroup();
         hg.space(5);
         Arrays.stream(desc.bindings).forEach((bind) -> {
-          hg.addActor(new G24Label(bind, "bubble_gray"));
+          hg.addActor(new G24Label(bind, G24LabelStyle.BubbleGray));
         });
         inner.add(hg).row();
       }

@@ -15,6 +15,7 @@ import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.IntInput;
 import cs1396.escaperoom.ui.widgets.G24TextInput.StringInput;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24NumberInput.FloatInput;
 
 public class PropertyConfiguration extends Table implements HandlesMenuClose {
@@ -111,7 +112,7 @@ public class PropertyConfiguration extends Table implements HandlesMenuClose {
   }
 
   public void addElement(String label, String helpString, Actor a, boolean separateByLine){
-    G24Label labelEl = new G24Label(label + ":", "default");
+    G24Label labelEl = new G24Label(label + ":", G24LabelStyle.Default);
 
     if (helpString != null && !helpString.isEmpty()){
       new Tooltip.Builder(helpString).target(labelEl, Tooltip.stageHelper(labelEl)).build();
@@ -125,7 +126,7 @@ public class PropertyConfiguration extends Table implements HandlesMenuClose {
   }
 
   public void addLine() {
-    add(new G24Label("", "default")).row();
+    add(new G24Label("", G24LabelStyle.Default)).row();
   }
 
 	@Override

@@ -7,11 +7,12 @@ import cs1396.escaperoom.game.entities.properties.base.ItemProperty;
 import cs1396.escaperoom.game.entities.properties.values.ItemPropertyValue;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class PropertyConfigurationMenu extends Menu {
   private class SpecialLittleTinyBabyLabel extends G24Label implements HandlesMenuClose {
     SpecialLittleTinyBabyLabel(String content){
-      super(content, "default");
+      super(content, G24LabelStyle.Default);
       setWrap(true);
       setWidth(150);
     }
@@ -59,7 +60,7 @@ public class PropertyConfigurationMenu extends Menu {
           ConfigurationMenu.VGroup conflicts = new ConfigurationMenu.VGroup();
           property.getDescription().mutallyExclusiveWith.forEach((p) -> {
             if (p != property.getType()){
-              conflicts.addActor(new G24Label(p.getEmptyProperty().getDescription().name, "bubble"));
+              conflicts.addActor(new G24Label(p.getEmptyProperty().getDescription().name, G24LabelStyle.Bubble));
             }
           });
 

@@ -16,6 +16,7 @@ import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.game.entities.player.Player;
 import cs1396.escaperoom.game.ui.ActionDialog;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class ItemSlot extends Container<cs1396.escaperoom.ui.ItemSlot.ItemSlotInner> {
   public ItemSlotInner inner;
@@ -52,7 +53,7 @@ public class ItemSlot extends Container<cs1396.escaperoom.ui.ItemSlot.ItemSlotIn
     protected void setItem(Item item){
       ItemSlotValues iv = new ItemSlotValues(item);
       this.add(iv.itemPreview);
-      new Tooltip.Builder(new G24Label(item.getItemName() + " ID " + item.getID(), "bubble_gray")).target(iv.itemPreview, Tooltip.stageHelper(this)).build();
+      new Tooltip.Builder(new G24Label(item.getItemName() + " ID " + item.getID(), G24LabelStyle.BubbleGray)).target(iv.itemPreview, Tooltip.stageHelper(this)).build();
       this.slotValues = Optional.of(iv);
     }
 

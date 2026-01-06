@@ -26,6 +26,7 @@ import cs1396.escaperoom.ui.FilterUI;
 import cs1396.escaperoom.ui.notifications.Notifier;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class Leaderboard extends MenuScreen {
   G24TextButton backButton;
@@ -55,25 +56,25 @@ public class Leaderboard extends MenuScreen {
 
   private void addEntry(PlayerRecord record) {
     // Username
-    entries.add(new G24Label(record.username, "white"));
+    entries.add(new G24Label(record.username, G24LabelStyle.White));
     // attempts
-    entries.add(new G24Label(Integer.toString(record.attempts), "white"));
+    entries.add(new G24Label(Integer.toString(record.attempts), G24LabelStyle.White));
     // clears
-    entries.add(new G24Label(Integer.toString(record.clears), "white"));
+    entries.add(new G24Label(Integer.toString(record.clears), G24LabelStyle.White));
     // uniqueclears
-    entries.add(new G24Label(Integer.toString(record.clearList.size), "white"));
+    entries.add(new G24Label(Integer.toString(record.clearList.size), G24LabelStyle.White));
     entries.row();
   }
 
   private void addHeader() {
     // Username
-    entries.add(new G24Label("Username", "title"));
+    entries.add(new G24Label("Username", G24LabelStyle.Title));
     // attempts
-    entries.add(new G24Label("Attempts", "title"));
+    entries.add(new G24Label("Attempts", G24LabelStyle.Title));
     // clears
-    entries.add(new G24Label("Map Clears", "title"));
+    entries.add(new G24Label("Map Clears", G24LabelStyle.Title));
     // uniqueclears
-    entries.add(new G24Label("Unique Clears", "title"));
+    entries.add(new G24Label("Unique Clears", G24LabelStyle.Title));
     entries.row();
   }
 

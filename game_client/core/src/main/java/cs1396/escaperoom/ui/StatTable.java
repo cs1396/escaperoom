@@ -4,14 +4,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import cs1396.escaperoom.services.GameStatistics;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class StatTable extends Table {
   public StatTable(GameStatistics stats){
     defaults().pad(30);
     if (stats.completedSucessfully) {
-      add(new G24Label("Map Completed!", "title")).colspan(2);
+      add(new G24Label("Map Completed!", G24LabelStyle.Title)).colspan(2);
     } else {
-      add(new G24Label("You Surrendered", "bubble")).colspan(2);
+      add(new G24Label("You Surrendered", G24LabelStyle.Bubble)).colspan(2);
     }
 
     long ms = stats.timeMilliseconds;
@@ -30,7 +31,7 @@ public class StatTable extends Table {
 
   private <T> void addLabel(String label, T value, String suffix) {
     row();
-    add(new G24Label(label + ":", "bubble")).center().expandX();
-    add(new G24Label(value.toString() + " " + suffix, "white")).left();
+    add(new G24Label(label + ":", G24LabelStyle.Bubble)).center().expandX();
+    add(new G24Label(value.toString() + " " + suffix, G24LabelStyle.White)).left();
   }
 }

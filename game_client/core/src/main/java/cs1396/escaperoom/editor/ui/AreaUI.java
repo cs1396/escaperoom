@@ -12,6 +12,7 @@ import cs1396.escaperoom.engine.BackManager;
 import cs1396.escaperoom.engine.control.CursorManager;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 import cs1396.escaperoom.ui.widgets.G24NumberInput;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 
@@ -97,16 +98,16 @@ public class AreaUI extends Table implements HandlesMenuClose {
       selector.setRegion(region);
     });
 
-    add(new G24Label("x", "bubble"));
+    add(new G24Label("x", G24LabelStyle.Bubble));
     add(xi).row();
 
-    add(new G24Label("y", "bubble"));
+    add(new G24Label("y", G24LabelStyle.Bubble));
     add(yi).row();
 
-    add(new G24Label("width", "bubble"));
+    add(new G24Label("width", G24LabelStyle.Bubble));
     add(wi).row();
 
-    add(new G24Label("height", "bubble"));
+    add(new G24Label("height", G24LabelStyle.Bubble));
     add(hi).row();
 
     selectAreaButton = new G24TextButton("SelectArea");

@@ -25,6 +25,7 @@ import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.ItemSlot;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class ItemDrawer extends Tree<cs1396.escaperoom.editor.tools.ItemDrawer.ItemCategory, Item> {
 
@@ -33,7 +34,7 @@ public class ItemDrawer extends Tree<cs1396.escaperoom.editor.tools.ItemDrawer.I
 
   private static class ItemDrawerEntry extends Table {
     public ItemDrawerEntry(String categoryName) {
-      add(new G24Label(categoryName));
+      add(new G24Label(categoryName, G24LabelStyle.DefaultMedText));
     }
     public ItemDrawerEntry(Item item) {
       padLeft(0);

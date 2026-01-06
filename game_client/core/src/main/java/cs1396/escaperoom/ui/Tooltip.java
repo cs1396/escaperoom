@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Timer.Task;
 import cs1396.escaperoom.game.entities.Item;
 import cs1396.escaperoom.ui.Tooltip.Builder.LazyUIStage;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class Tooltip extends Table {
   public static float DEFAULT_FADE_TIME = 0.3f;
@@ -182,7 +183,7 @@ public class Tooltip extends Table {
     }
 
     public Builder(String text, int align) {
-      Label label = new G24Label(text, "bubble");
+      Label label = new G24Label(text, G24LabelStyle.Bubble);
       label.setAlignment(align);
       this.content = label;
     }

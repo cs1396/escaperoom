@@ -26,6 +26,7 @@ import cs1396.escaperoom.screens.LevelEditor;
 import cs1396.escaperoom.ui.ItemSelectUI;
 import cs1396.escaperoom.ui.ItemSelectUI.SelectedItem;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class ItemContainsItem extends Conditional {
 
@@ -143,10 +144,10 @@ public class ItemContainsItem extends Conditional {
     ui.space(20);
     ui.align(Align.center);
 
-    ui.addActor(new G24Label("Container:", "bubble"));
+    ui.addActor(new G24Label("Container:", G24LabelStyle.Bubble));
     ui.addActor(select1);
 
-    ui.addActor(new G24Label("Contained:", "bubble"));
+    ui.addActor(new G24Label("Contained:", G24LabelStyle.Bubble));
     ui.addActor(select2);
 
     // Both of these UIs applied a view, discard them

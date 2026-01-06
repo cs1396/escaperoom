@@ -29,6 +29,7 @@ import cs1396.escaperoom.ui.widgets.G24ImageButton;
 import cs1396.escaperoom.ui.widgets.G24NumberInput;
 import cs1396.escaperoom.ui.widgets.G24TextButton;
 import cs1396.escaperoom.ui.widgets.G24Label;
+import cs1396.escaperoom.ui.widgets.G24Label.G24LabelStyle;
 
 public class DrawingUI extends Table implements HandlesMenuClose {
   DrawingPane pane;
@@ -53,7 +54,7 @@ public class DrawingUI extends Table implements HandlesMenuClose {
         }
       });
 
-      label = new G24Label(item.getItemName(), "default");
+      label = new G24Label(item.getItemName(), G24LabelStyle.Default);
       slot = new ItemSlot(item);
     }
 
@@ -104,7 +105,7 @@ public class DrawingUI extends Table implements HandlesMenuClose {
     btnGroup.add(new ColorButton(Color.BLUE));
     btnGroup.add(new ColorButton(Color.BLACK));
 
-    G24Label label = new G24Label("Brush Size:", "bubble");
+    G24Label label = new G24Label("Brush Size:", G24LabelStyle.Bubble);
     G24NumberInput numberInput = new G24NumberInput();
     numberInput.setText(Integer.toString(DrawingPane.getBrushSize()));
     numberInput.setMaxLength(2);
@@ -211,10 +212,10 @@ public class DrawingUI extends Table implements HandlesMenuClose {
     add(label).left();
     add(numberInput).left().maxWidth(60);
     row();
-    add(new G24Label("Shape:", "bubble")).left();
+    add(new G24Label("Shape:", G24LabelStyle.Bubble)).left();
     add(brushShapes).left();
     row();
-    add(new G24Label("Item Brush", "title")).center().colspan(2);
+    add(new G24Label("Item Brush", G24LabelStyle.Title)).center().colspan(2);
     row();
     add(itemSelectPane).center().maxHeight(300).colspan(2);
     row();
