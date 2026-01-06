@@ -8,8 +8,11 @@ import cs1396.escaperoom.screens.AbstractScreen;
 
 public class G24TextButton extends TextButton{
 	public G24TextButton(String text) {
-		super(text, AbstractScreen.skin);
-    getLabel().setFontScale(0.75f);
+    this(text, "default");
+	}
+
+	public G24TextButton(String text, String style) {
+		super(text, AbstractScreen.skin, style);
 	}
 
   /**

@@ -46,11 +46,11 @@ public class MainMenu extends MenuScreen {
 
   @Override
   public void init() {
-    exitButton = new G24TextButton("Exit");
+    exitButton = new G24TextButton("Exit", "med-text");
     exitButton.addListener(onExit);
-    loginButton = new G24TextButton("Login");
+    loginButton = new G24TextButton("Login", "med-text");
     loginButton.addListener(onLogin);
-    myMapsButton = new G24TextButton("My Maps");
+    myMapsButton = new G24TextButton("My Maps", "med-text");
     myMapsButton.addListener(onMyMaps);
     buildUI();
   }

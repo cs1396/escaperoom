@@ -87,14 +87,14 @@ public class ItemInArea extends Conditional {
 
     ItemInRegionUI itemInRegionUI = new ItemInRegionUI();
 
-    itemInRegionUI.add(new G24Label("Item", "underline", 0.65f));
+    itemInRegionUI.add(new G24Label("Item", "underline"));
     itemInRegionUI.row();
 
     ItemSelectUI selectUI = new ItemSelectUI(potentialItems, this.item, "No obtainable items are currently on the grid!", screen);
     itemInRegionUI.add(selectUI);
     itemInRegionUI.row();
 
-    itemInRegionUI.add(new G24Label("Region", "underline", 0.65f));
+    itemInRegionUI.add(new G24Label("Region", "underline"));
     itemInRegionUI.row();
 
     AreaUI areaUI = new AreaUI(screen, this.targetRegion);

@@ -19,23 +19,23 @@ import cs1396.escaperoom.ui.widgets.G24Label;
 public class PropertyBank extends ScrollPane {
   public static class PropertyPill<V extends ItemPropertyValue, P extends ItemProperty<V>> extends G24Label {
     public PropertyPill(P property) {
-      super(property.getDescription().name, "bubble", 0.65f);
+      super(property.getDescription().name, "bubble");
       addListener(CursorManager.hoverHelper(CursorType.Hand));
       ItemEditor.get().getDragAndDrop().addSource(new DragAndDrop.Source(this) {
         @Override
         public Payload dragStart(InputEvent event, float x, float y, int pointer) {
           Payload pl = new Payload();
           pl.setObject(property.getType());
-          G24Label l = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label l = new G24Label(property.getDescription().name, "bubble");
           l.pack();
           pl.setDragActor(l);
 
-          G24Label il = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label il = new G24Label(property.getDescription().name, "bubble");
           il.setColor(1, 0, 0, 1);
           il.pack();
           pl.setInvalidDragActor(il);
 
-          G24Label vl = new G24Label(property.getDescription().name, "bubble", 0.65f);
+          G24Label vl = new G24Label(property.getDescription().name, "bubble");
           vl.setColor(0, 1, 0, 1);
           vl.pack();
           pl.setValidDragActor(vl);

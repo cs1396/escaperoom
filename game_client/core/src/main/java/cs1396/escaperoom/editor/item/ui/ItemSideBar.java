@@ -4,11 +4,13 @@ import java.util.function.Function;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import cs1396.escaperoom.engine.assets.AssetManager;
 import cs1396.escaperoom.engine.assets.maps.MapLoader;
 import cs1396.escaperoom.game.entities.Item;
+import cs1396.escaperoom.screens.AbstractScreen;
 import cs1396.escaperoom.screens.ItemEditor;
 import cs1396.escaperoom.ui.Tooltip;
 import cs1396.escaperoom.ui.notifications.Notifier;
@@ -27,9 +29,9 @@ public class ItemSideBar extends Table {
 
   private class FieldHeader extends G24Label {
     FieldHeader(String title, String description){
-      super(title, "underline", 0.65f);
+      super(title, "underline");
       if (description != null && !description.isEmpty())
-      new Tooltip.Builder(new G24Label(description, "bubble_gray", 0.65f)).target(this, Tooltip.stageHelper(this)).build();
+      new Tooltip.Builder(new G24Label(description, "bubble_gray")).target(this, Tooltip.stageHelper(this)).build();
     }
   }
 
@@ -104,6 +106,7 @@ public class ItemSideBar extends Table {
         "None", 
         (i, s) -> i.getType().name = s
     );
+    nameInp.setStyle(AbstractScreen.skin.get("transparent", TextFieldStyle.class));
 
     G24TextInput categoryInp = nonEmptyStringField(
         "Category", 
@@ -174,16 +177,15 @@ public class ItemSideBar extends Table {
       return null;
     };
 
-    add(new FieldHeader("Name", null)).row();
     add(nameInp).row();
 
     add(new FieldHeader("Category", "Category in the Item Drawer")).row();
     add(categoryInp).row();
 
     add(new FieldHeader("Size", null)).row();
-    add(new G24Label("Width: ", "default", 0.65f)).row();
+    add(new G24Label("Width: ", "default")).row();
     add(sizeInpWidth).row();
-    add(new G24Label("Height: ", "default", 0.65f)).row();
+    add(new G24Label("Height: ", "default")).row();
     add(sizeInpHeight).row();
 
     add(new FieldHeader("Render Priority","\"Height\" of this item (e.g. 0 for floors, 5 for player, etc)")).row();;

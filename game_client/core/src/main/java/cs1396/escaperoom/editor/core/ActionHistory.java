@@ -26,7 +26,7 @@ public class ActionHistory {
   private void buildToolTip(String title, Input input, Actor target){
     String label = title;
     label += "\n Hotkey(s): " + String.join("\n",input.description().bindings);
-    G24Label l = new G24Label(label, "bubble_gray", 0.65f);
+    G24Label l = new G24Label(label, "bubble_gray");
     l.pack();
     new Tooltip.Builder(l).target(target, () -> Optional.of(target.getStage())).build();
   }

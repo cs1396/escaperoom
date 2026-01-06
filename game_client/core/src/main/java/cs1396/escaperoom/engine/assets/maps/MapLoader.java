@@ -2,7 +2,6 @@ package cs1396.escaperoom.engine.assets.maps;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOError;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.logging.Logger;

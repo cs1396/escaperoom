@@ -124,7 +124,7 @@ public class ItemDrawer extends Tree<cs1396.escaperoom.editor.tools.ItemDrawer.I
         getSelection().clear();
         Payload p = new DragAndDrop.Payload();
         p.setObject(node.getValue());
-        G24Label l = new G24Label(Item.class.cast(node.getValue()).getItemName(), "default", 0.65f);
+        G24Label l = new G24Label(Item.class.cast(node.getValue()).getItemName(), "default");
         p.setDragActor(l);
         return p;
       }

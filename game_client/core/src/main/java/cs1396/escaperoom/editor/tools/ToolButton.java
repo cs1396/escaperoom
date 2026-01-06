@@ -21,7 +21,7 @@ public class ToolButton extends ImageButton {
     if (tool.getType().getHotKey() != null){
       label += "\nHotKey(s): " + String.join("\n",tool.getType().getHotKey().description().bindings);
     }
-    G24Label l = new G24Label( label, "bubble_gray", 0.65f);
+    G24Label l = new G24Label( label, "bubble_gray");
     l.pack();
     new Tooltip.Builder(l).target(this, () -> Optional.of(this.getStage())).build();
 
