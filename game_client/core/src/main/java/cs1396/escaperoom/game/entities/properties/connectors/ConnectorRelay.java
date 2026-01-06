@@ -465,10 +465,10 @@ public class ConnectorRelay extends Connector {
       "Relay type",
       null,
       new Select<RelayType>(
-        (val) -> this.relayType = (RelayType)val,
+        (val) -> this.relayType = val,
         (val) -> {},
         RelayType.values(),
-        (val) -> ((RelayType)val).name(),
+        (val) -> val.name(),
         1,
         relayType
       )
